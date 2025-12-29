@@ -122,6 +122,7 @@ model User {
   name      String
   email     String   @unique
   role      UserRole
+  password  String
 
   vaccinations Vaccination[]
 

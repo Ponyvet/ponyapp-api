@@ -1,17 +1,30 @@
 import Fastify from 'fastify'
+import cookie from '@fastify/cookie'
+import jwt from '@fastify/jwt'
+
 import prismaPlugin from './plugins/prisma'
+import authPlugin from './plugins/auth'
 import clientRoutes from './modules/clients/client.routes'
-/*import authRoutes from './modules/auth/auth.routes'
-import clientRoutes from './modules/clients/client.routes' */
+import authRoutes from './modules/auth/auth.routes'
 
 export const buildApp = () => {
   const app = Fastify({ logger: true })
 
   app.register(prismaPlugin)
+  app.register(authPlugin)
+  app.register(cookie)
+  app.register(jwt, {
+    secret: process.env.JWT_SECRET!,
+    cookie: {
+      cookieName: 'token',
+      signed: false,
+    },
+  })
 
-  app.register(clientRoutes, { prefix: '/clients' })
-  /*app.register(authRoutes, { prefix: '/auth' })
-  app.register(clientRoutes, { prefix: '/clients' }) */
+  app.register(clientRoutes, {
+    prefix: '/clients',
+  })
+  app.register(authRoutes, { prefix: '/auth' })
 
   return app
 }
