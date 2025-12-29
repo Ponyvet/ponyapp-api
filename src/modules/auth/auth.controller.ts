@@ -33,10 +33,7 @@ export const loginController = async (
     .send({ message: 'Inicio de sesión exitoso' })
 }
 
-export const logoutController = async (
-  _req: FastifyRequest,
-  reply: FastifyReply
-) => {
+export const logoutController = (_req: FastifyRequest, reply: FastifyReply) => {
   reply
     .clearCookie('token', {
       httpOnly: true,
