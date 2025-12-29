@@ -6,6 +6,7 @@ import prismaPlugin from './plugins/prisma'
 import authPlugin from './plugins/auth'
 import clientRoutes from './modules/clients/client.routes'
 import authRoutes from './modules/auth/auth.routes'
+import petsRoutes from './modules/pets/pets.routes'
 
 export const buildApp = () => {
   const app = Fastify({ logger: true })
@@ -25,6 +26,7 @@ export const buildApp = () => {
     prefix: '/clients',
   })
   app.register(authRoutes, { prefix: '/auth' })
+  app.register(petsRoutes, { prefix: '/pets' })
 
   return app
 }
