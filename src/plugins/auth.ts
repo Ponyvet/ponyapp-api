@@ -1,5 +1,5 @@
 import fp from 'fastify-plugin'
-import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
+import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify'
 
 export default fp((app: FastifyInstance) => {
   app.decorate(

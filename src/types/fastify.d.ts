@@ -1,5 +1,5 @@
-import { preHandlerHookHandler } from 'fastify'
-import { PrismaClient } from '../generated/prisma/client'
+import type { preHandlerHookHandler } from 'fastify'
+import type { PrismaClient } from '../generated/prisma/client'
 
 declare module 'fastify' {
   interface FastifyInstance {

@@ -1,4 +1,4 @@
-import { FastifyReply, FastifyRequest } from 'fastify'
+import type { FastifyReply, FastifyRequest } from 'fastify'
 
 import { createClientSchema } from './client.schema'
 import { createClient, getClients } from './client.service'

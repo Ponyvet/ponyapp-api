@@ -22,6 +22,10 @@ export default defineConfig([
       'no-debugger': 'error',
       'no-unsafe-finally': 'error',
       'require-await': 'error',
+      '@typescript-eslint/consistent-type-imports': [
+        'error',
+        { prefer: 'type-imports' },
+      ],
     },
   },
   tseslint.configs.recommended,
