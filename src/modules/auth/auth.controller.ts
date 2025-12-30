@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 import bcrypt from 'bcrypt'
 
-import { loginSchema } from './auth.schema'
+import { loginSchema, sessionSchema } from './auth.schema'
 
 export const loginController = async (
   req: FastifyRequest,
@@ -40,4 +40,22 @@ export const logoutController = (_req: FastifyRequest, reply: FastifyReply) => {
       path: '/',
     })
     .send({ message: 'Cierre de sesión exitoso' })
+}
+
+export const profileController = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  const { id: userId } = sessionSchema.parse(req.user)
+
+  const user = await req.server.prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+    },
+  })
+
+  reply.send(user)
 }

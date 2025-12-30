@@ -6,3 +6,8 @@ export const loginSchema = z.object({
 })
 
 export type LoginInput = z.infer<typeof loginSchema>
+
+export const sessionSchema = z.object({
+  id: z.string(),
+  iat: z.number(),
+})
