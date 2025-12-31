@@ -6,5 +6,5 @@ export default function (app: FastifyInstance) {
   app.addHook('preHandler', app.authenticate)
 
   app.post('/', createPetController)
-  app.get('/:clientId', getClientPetsController)
+  app.get('/client/:clientId', getClientPetsController)
 }
