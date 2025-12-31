@@ -12,3 +12,12 @@ export const createClient = (
 export const getClients = (prisma: FastifyInstance['prisma']) => {
   return prisma.client.findMany()
 }
+
+export const getSingleClient = (
+  prisma: FastifyInstance['prisma'],
+  clientId: Prisma.ClientWhereUniqueInput['id']
+) => {
+  return prisma.client.findUnique({
+    where: { id: clientId },
+  })
+}

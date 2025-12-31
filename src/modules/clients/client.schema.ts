@@ -6,3 +6,7 @@ export const createClientSchema = z.object({
   address: z.string().nonempty(),
   notes: z.string().optional(),
 })
+
+export const clientIdParamSchema = z.object({
+  id: z.string().nonempty(),
+})

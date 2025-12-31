@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 
-import { createClientSchema } from './client.schema'
-import { createClient, getClients } from './client.service'
+import { clientIdParamSchema, createClientSchema } from './client.schema'
+import { createClient, getClients, getSingleClient } from './client.service'
 
 export const createClientController = async (
   req: FastifyRequest,
@@ -18,4 +18,16 @@ export const getClientsController = async (
 ) => {
   const clients = await getClients(req.server.prisma)
   reply.send(clients)
+}
+
+export const getSingleClientController = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  const { id: clientId } = clientIdParamSchema.parse(req.params)
+  const client = await getSingleClient(req.server.prisma, clientId)
+  if (!client) {
+    return reply.code(404).send({ message: 'Client not found' })
+  }
+  reply.send(client)
 }
