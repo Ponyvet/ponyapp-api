@@ -1,6 +1,7 @@
 import Fastify from 'fastify'
 import cookie from '@fastify/cookie'
 import jwt from '@fastify/jwt'
+import cors from '@fastify/cors'
 
 import prismaPlugin from './plugins/prisma'
 import authPlugin from './plugins/auth'
@@ -13,6 +14,10 @@ import vaccinationRoutes from './modules/vaccination/vaccination.routes'
 export const buildApp = () => {
   const app = Fastify({ logger: true })
 
+  app.register(cors, {
+    origin: ['http://localhost:5173'],
+    credentials: true,
+  })
   app.register(prismaPlugin)
   app.register(authPlugin)
   app.register(cookie)
