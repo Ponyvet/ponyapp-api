@@ -13,6 +13,8 @@ export const createPet = (
       breed: data.breed,
       sex: data.sex,
       birthDate: data.birthDate,
+      color: data.color,
+      notes: data.notes,
       client: { connect: { id: data.clientId } },
     },
   })

@@ -62,6 +62,8 @@ model Pet {
   breed      String?
   sex        Sex
   birthDate  DateTime?
+  color     String?
+  notes      String?
 
   clientId   String
   client     Client   @relation(fields: [clientId], references: [id])

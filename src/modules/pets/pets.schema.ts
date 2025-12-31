@@ -8,6 +8,8 @@ export const createPetSchema = z.object({
   sex: z.enum(Sex),
   birthDate: z.coerce.date().optional(),
   clientId: z.string().nonempty(),
+  color: z.string().optional(),
+  notes: z.string().optional(),
 })
 
 export type CreatePetDto = z.infer<typeof createPetSchema>
