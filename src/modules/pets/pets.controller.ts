@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify'
 
-import { createPetSchema } from './pets.schema'
-import { createPet, getClientPets } from './pets.service'
+import { createPetSchema, petIdParamSchema } from './pets.schema'
+import { createPet, getClientPets, getSinglePet } from './pets.service'
 
 export const createPetController = async (
   req: FastifyRequest,
@@ -19,4 +19,16 @@ export const getClientPetsController = async (
   const clientId = req.params as { clientId: string }
   const pets = await getClientPets(req.server.prisma, clientId.clientId)
   reply.send(pets)
+}
+
+export const getSinglePetController = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  const { petId } = petIdParamSchema.parse(req.params)
+  const pet = await getSinglePet(req.server.prisma, { id: petId })
+  if (!pet) {
+    return reply.code(404).send({ message: 'Pet not found' })
+  }
+  reply.send(pet)
 }

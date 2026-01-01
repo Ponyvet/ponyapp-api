@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 
 import type { CreatePetDto } from './pets.schema'
+import type { Prisma } from '../../generated/prisma/browser'
 
 export const createPet = (
   prisma: FastifyInstance['prisma'],
@@ -26,5 +27,14 @@ export const getClientPets = (
 ) => {
   return prisma.pet.findMany({
     where: { clientId },
+  })
+}
+
+export const getSinglePet = (
+  prisma: FastifyInstance['prisma'],
+  petId: Prisma.PetWhereUniqueInput
+) => {
+  return prisma.pet.findUnique({
+    where: petId,
   })
 }

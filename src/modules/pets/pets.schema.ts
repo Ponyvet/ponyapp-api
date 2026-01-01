@@ -13,3 +13,7 @@ export const createPetSchema = z.object({
 })
 
 export type CreatePetDto = z.infer<typeof createPetSchema>
+
+export const petIdParamSchema = z.object({
+  petId: z.string().nonempty(),
+})
