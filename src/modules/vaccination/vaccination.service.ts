@@ -26,3 +26,25 @@ export const getPetVaccination = (
     where: { petId },
   })
 }
+
+export const getVaccinationsByDateRange = (
+  prisma: FastifyInstance['prisma'],
+  startDate: Date,
+  endDate: Date
+) => {
+  return prisma.vaccination.findMany({
+    where: {
+      nextDueDate: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+    include: {
+      pet: true,
+      vaccine: true,
+    },
+    orderBy: {
+      appliedAt: 'desc',
+    },
+  })
+}

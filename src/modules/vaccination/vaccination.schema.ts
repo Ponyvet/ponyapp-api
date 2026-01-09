@@ -14,4 +14,10 @@ export const petIdParamSchema = z.object({
   petId: z.string().nonempty(),
 })
 
+export const dateRangeQuerySchema = z.object({
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+})
+
 export type CreateVaccinationDto = z.infer<typeof createVaccinationItemSchema>
+export type DateRangeQueryDto = z.infer<typeof dateRangeQuerySchema>

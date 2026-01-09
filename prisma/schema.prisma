@@ -89,8 +89,8 @@ model Vaccine {
 
 model Vaccination {
   id              String   @id @default(uuid())
-  appliedAt       DateTime
-  nextDueDate     DateTime
+  appliedAt       DateTime?
+  nextDueDate     DateTime?
   status          VaccinationStatus
 
   petId           String
