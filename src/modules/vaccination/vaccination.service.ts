@@ -24,6 +24,7 @@ export const getPetVaccination = (
 ) => {
   return prisma.vaccination.findMany({
     where: { petId },
+    orderBy: { updatedAt: 'desc' },
   })
 }
 

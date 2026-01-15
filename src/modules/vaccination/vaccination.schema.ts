@@ -1,14 +1,35 @@
 import z from 'zod'
 import { VaccinationStatus } from '../../generated/prisma/enums'
 
-export const createVaccinationItemSchema = z.object({
-  appliedAt: z.coerce.date(),
-  nextDueDate: z.coerce.date(),
-  status: z.enum(VaccinationStatus),
-  petId: z.string().nonempty(),
-  vaccineId: z.string().nonempty(),
-  veterinarianId: z.string().nonempty(),
-})
+export const createVaccinationItemSchema = z
+  .object({
+    appliedAt: z.coerce.date().nullable(),
+    nextDueDate: z.coerce.date().nullable(),
+    status: z.enum(VaccinationStatus),
+    petId: z.string().nonempty(),
+    vaccineId: z.string().nonempty(),
+    veterinarianId: z.string().nonempty(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.appliedAt && !data.nextDueDate) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'At least one of appliedAt or nextDueDate must be provided',
+      })
+    }
+
+    if (
+      data.appliedAt &&
+      data.nextDueDate &&
+      data.nextDueDate <= data.appliedAt
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'nextDueDate must be after appliedAt',
+        path: ['nextDueDate'],
+      })
+    }
+  })
 
 export const petIdParamSchema = z.object({
   petId: z.string().nonempty(),
