@@ -8,6 +8,7 @@ import {
 import {
   createVaccine,
   getVaccines,
+  getSingleVaccine,
   updateVaccine,
   deleteVaccine,
 } from './vaccines.service'
@@ -27,6 +28,18 @@ export const getVaccinesController = async (
 ) => {
   const vaccines = await getVaccines(req.server.prisma)
   reply.send(vaccines)
+}
+
+export const getSingleVaccineController = async (
+  req: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const { id: vaccineId } = vaccineIdParamSchema.parse(req.params)
+  const vaccine = await getSingleVaccine(req.server.prisma, vaccineId)
+  if (!vaccine) {
+    return reply.code(404).send({ message: 'Vaccine not found' })
+  }
+  reply.send(vaccine)
 }
 
 export const updateVaccineController = async (

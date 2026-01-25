@@ -15,6 +15,18 @@ export const getVaccines = (prisma: FastifyInstance['prisma']) => {
   })
 }
 
+export const getSingleVaccine = (
+  prisma: FastifyInstance['prisma'],
+  vaccineId: string,
+) => {
+  return prisma.vaccine.findFirst({
+    where: {
+      id: vaccineId,
+      isActive: true,
+    },
+  })
+}
+
 export const updateVaccine = async (
   prisma: FastifyInstance['prisma'],
   vaccineId: string,
