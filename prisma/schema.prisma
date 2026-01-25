@@ -48,6 +48,7 @@ model Client {
   phone     String
   address   String
   notes     String?
+  isActive  Boolean  @default(true)
 
   pets      Pet[]
 
@@ -64,6 +65,7 @@ model Pet {
   birthDate  DateTime?
   color     String?
   notes      String?
+  isActive   Boolean  @default(true)
 
   clientId   String
   client     Client   @relation(fields: [clientId], references: [id])
@@ -80,6 +82,7 @@ model Vaccine {
   species      Species
   type         String
   intervalDays Int
+  isActive     Boolean  @default(true)
 
   vaccinations Vaccination[]
 
@@ -103,6 +106,7 @@ model Vaccination {
   veterinarian    User     @relation(fields: [veterinarianId], references: [id])
 
   reminder        Reminder?
+  isActive        Boolean  @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -112,6 +116,7 @@ model Reminder {
   id             String   @id @default(uuid())
   dueDate        DateTime
   notified       Boolean  @default(false)
+  isActive       Boolean  @default(true)
 
   vaccinationId  String   @unique
   vaccination    Vaccination @relation(fields: [vaccinationId], references: [id])
@@ -125,6 +130,7 @@ model User {
   email     String   @unique
   role      UserRole
   password  String
+  isActive  Boolean  @default(true)
 
   vaccinations Vaccination[]
 
