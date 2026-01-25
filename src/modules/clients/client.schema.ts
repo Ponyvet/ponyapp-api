@@ -2,17 +2,14 @@ import { z } from 'zod'
 
 export const createClientSchema = z.object({
   name: z.string().nonempty(),
-  phone: z.string().min(8),
+  phone: z.string().refine((val) => val.length === 10, {
+    message: 'Phone number must be exactly 10 characters long',
+  }),
   address: z.string().nonempty(),
   notes: z.string().optional(),
 })
 
-export const updateClientSchema = z.object({
-  name: z.string().nonempty().optional(),
-  phone: z.string().min(8).optional(),
-  address: z.string().nonempty().optional(),
-  notes: z.string().optional(),
-})
+export const updateClientSchema = createClientSchema.partial()
 
 export const clientIdParamSchema = z.object({
   id: z.string().nonempty(),
