@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 
-import type { CreatePetDto, UpdatePetDto } from './pets.schema'
+import type { CreatePetDto, UpdatePetDto, PetsQueryDto } from './pets.schema'
 import type { Prisma } from '../../generated/prisma/browser'
 
 export const createPet = (
@@ -31,6 +31,65 @@ export const getClientPets = (
       isActive: true,
     },
   })
+}
+
+export const getAllPets = async (
+  prisma: FastifyInstance['prisma'],
+  query: PetsQueryDto,
+) => {
+  const { page, limit, sortBy, sortOrder, ...filters } = query
+
+  const where: Prisma.PetWhereInput = {
+    isActive: true,
+    ...(filters.name && {
+      name: {
+        contains: filters.name,
+        mode: 'insensitive' as Prisma.QueryMode,
+      },
+    }),
+    ...(filters.species && { species: filters.species }),
+    ...(filters.sex && { sex: filters.sex }),
+    ...(filters.breed && {
+      breed: {
+        contains: filters.breed,
+        mode: 'insensitive' as Prisma.QueryMode,
+      },
+    }),
+    ...(filters.clientId && { clientId: filters.clientId }),
+  }
+
+  const skip = (page - 1) * limit
+
+  const [pets, total] = await Promise.all([
+    prisma.pet.findMany({
+      where,
+      include: {
+        client: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+          },
+        },
+      },
+      orderBy: { [sortBy]: sortOrder },
+      skip,
+      take: limit,
+    }),
+    prisma.pet.count({ where }),
+  ])
+
+  return {
+    data: pets,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      hasNext: page * limit < total,
+      hasPrev: page > 1,
+    },
+  }
 }
 
 export const getSinglePet = (

@@ -4,10 +4,12 @@ import {
   createPetSchema,
   petIdParamSchema,
   updatePetSchema,
+  petsQuerySchema,
 } from './pets.schema'
 import {
   createPet,
   getClientPets,
+  getAllPets,
   getSinglePet,
   updatePet,
   deletePet,
@@ -29,6 +31,15 @@ export const getClientPetsController = async (
   const clientId = req.params as { clientId: string }
   const pets = await getClientPets(req.server.prisma, clientId.clientId)
   reply.send(pets)
+}
+
+export const getAllPetsController = async (
+  req: FastifyRequest,
+  reply: FastifyReply,
+) => {
+  const query = petsQuerySchema.parse(req.query)
+  const result = await getAllPets(req.server.prisma, query)
+  reply.send(result)
 }
 
 export const getSinglePetController = async (
