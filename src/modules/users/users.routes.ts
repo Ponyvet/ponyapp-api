@@ -1,8 +1,11 @@
 import type { FastifyInstance } from 'fastify'
-import { getUserListController } from './users.controller'
+import { getUserListController, createUserController } from './users.controller'
 
 export default function (app: FastifyInstance) {
-  app.addHook('preHandler', app.authenticate)
+  // Endpoint público para registro de usuarios
+  app.post('/register', createUserController)
 
+  // Endpoints protegidos
+  app.addHook('preHandler', app.authenticate)
   app.get('/list', getUserListController)
 }
