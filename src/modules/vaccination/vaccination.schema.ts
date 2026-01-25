@@ -31,8 +31,18 @@ export const createVaccinationItemSchema = z
     }
   })
 
+export const updateVaccinationSchema = z.object({
+  appliedAt: z.coerce.date().nullable().optional(),
+  nextDueDate: z.coerce.date().nullable().optional(),
+  status: z.enum(VaccinationStatus).optional(),
+})
+
 export const petIdParamSchema = z.object({
   petId: z.string().nonempty(),
+})
+
+export const vaccinationIdParamSchema = z.object({
+  id: z.string().nonempty(),
 })
 
 export const dateRangeQuerySchema = z.object({
@@ -41,4 +51,5 @@ export const dateRangeQuerySchema = z.object({
 })
 
 export type CreateVaccinationDto = z.infer<typeof createVaccinationItemSchema>
+export type UpdateVaccinationDto = z.infer<typeof updateVaccinationSchema>
 export type DateRangeQueryDto = z.infer<typeof dateRangeQuerySchema>

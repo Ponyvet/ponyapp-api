@@ -1,11 +1,11 @@
 import type { FastifyInstance } from 'fastify'
 
-import type { CreatePetDto } from './pets.schema'
+import type { CreatePetDto, UpdatePetDto } from './pets.schema'
 import type { Prisma } from '../../generated/prisma/browser'
 
 export const createPet = (
   prisma: FastifyInstance['prisma'],
-  data: CreatePetDto
+  data: CreatePetDto,
 ) => {
   return prisma.pet.create({
     data: {
@@ -23,18 +23,61 @@ export const createPet = (
 
 export const getClientPets = (
   prisma: FastifyInstance['prisma'],
-  clientId: CreatePetDto['clientId']
+  clientId: CreatePetDto['clientId'],
 ) => {
   return prisma.pet.findMany({
-    where: { clientId },
+    where: {
+      clientId,
+      isActive: true,
+    },
   })
 }
 
 export const getSinglePet = (
   prisma: FastifyInstance['prisma'],
-  petId: Prisma.PetWhereUniqueInput
+  petId: Prisma.PetWhereUniqueInput,
 ) => {
-  return prisma.pet.findUnique({
-    where: petId,
+  return prisma.pet.findFirst({
+    where: {
+      ...petId,
+      isActive: true,
+    },
+  })
+}
+
+export const updatePet = async (
+  prisma: FastifyInstance['prisma'],
+  petId: string,
+  data: UpdatePetDto,
+) => {
+  const existingPet = await prisma.pet.findFirst({
+    where: { id: petId, isActive: true },
+  })
+
+  if (!existingPet) {
+    return null
+  }
+
+  return prisma.pet.update({
+    where: { id: petId },
+    data,
+  })
+}
+
+export const deletePet = async (
+  prisma: FastifyInstance['prisma'],
+  petId: string,
+) => {
+  const existingPet = await prisma.pet.findFirst({
+    where: { id: petId, isActive: true },
+  })
+
+  if (!existingPet) {
+    return null
+  }
+
+  return prisma.pet.update({
+    where: { id: petId },
+    data: { isActive: false },
   })
 }

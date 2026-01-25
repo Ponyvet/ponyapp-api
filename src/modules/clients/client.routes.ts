@@ -4,6 +4,8 @@ import {
   createClientController,
   getClientsController,
   getSingleClientController,
+  updateClientController,
+  deleteClientController,
 } from './client.controller'
 
 export default function (app: FastifyInstance) {
@@ -12,4 +14,6 @@ export default function (app: FastifyInstance) {
   app.post('/', createClientController)
   app.get('/', getClientsController)
   app.get('/:id', getSingleClientController)
+  app.put('/:id', updateClientController)
+  app.delete('/:id', deleteClientController)
 }

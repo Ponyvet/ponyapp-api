@@ -1,10 +1,13 @@
 import type { FastifyInstance } from 'fastify'
 
-import type { CreateVaccinationDto } from './vaccination.schema'
+import type {
+  CreateVaccinationDto,
+  UpdateVaccinationDto,
+} from './vaccination.schema'
 
 export const createVaccinationItem = (
   prisma: FastifyInstance['prisma'],
-  data: CreateVaccinationDto
+  data: CreateVaccinationDto,
 ) => {
   return prisma.vaccination.create({
     data: {
@@ -20,10 +23,13 @@ export const createVaccinationItem = (
 
 export const getPetVaccination = (
   prisma: FastifyInstance['prisma'],
-  petId: CreateVaccinationDto['petId']
+  petId: CreateVaccinationDto['petId'],
 ) => {
   return prisma.vaccination.findMany({
-    where: { petId },
+    where: {
+      petId,
+      isActive: true,
+    },
     orderBy: { updatedAt: 'desc' },
   })
 }
@@ -31,7 +37,7 @@ export const getPetVaccination = (
 export const getVaccinationsByDateRange = (
   prisma: FastifyInstance['prisma'],
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ) => {
   return prisma.vaccination.findMany({
     where: {
@@ -39,6 +45,7 @@ export const getVaccinationsByDateRange = (
         gte: startDate,
         lte: endDate,
       },
+      isActive: true,
     },
     include: {
       pet: true,
@@ -47,5 +54,42 @@ export const getVaccinationsByDateRange = (
     orderBy: {
       appliedAt: 'desc',
     },
+  })
+}
+
+export const updateVaccination = async (
+  prisma: FastifyInstance['prisma'],
+  vaccinationId: string,
+  data: UpdateVaccinationDto,
+) => {
+  const existingVaccination = await prisma.vaccination.findFirst({
+    where: { id: vaccinationId, isActive: true },
+  })
+
+  if (!existingVaccination) {
+    return null
+  }
+
+  return prisma.vaccination.update({
+    where: { id: vaccinationId },
+    data,
+  })
+}
+
+export const deleteVaccination = async (
+  prisma: FastifyInstance['prisma'],
+  vaccinationId: string,
+) => {
+  const existingVaccination = await prisma.vaccination.findFirst({
+    where: { id: vaccinationId, isActive: true },
+  })
+
+  if (!existingVaccination) {
+    return null
+  }
+
+  return prisma.vaccination.update({
+    where: { id: vaccinationId },
+    data: { isActive: false },
   })
 }

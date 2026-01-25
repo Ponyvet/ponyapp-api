@@ -4,6 +4,8 @@ import {
   createPetController,
   getClientPetsController,
   getSinglePetController,
+  updatePetController,
+  deletePetController,
 } from './pets.controller'
 
 export default function (app: FastifyInstance) {
@@ -12,4 +14,6 @@ export default function (app: FastifyInstance) {
   app.post('/', createPetController)
   app.get('/client/:clientId', getClientPetsController)
   app.get('/:petId', getSinglePetController)
+  app.put('/:petId', updatePetController)
+  app.delete('/:petId', deletePetController)
 }
