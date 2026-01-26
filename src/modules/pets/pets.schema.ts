@@ -40,7 +40,15 @@ export const petsQuerySchema = z.object({
   clientId: z.string().optional(),
 
   sortBy: z
-    .enum(['name', 'species', 'birthDate', 'createdAt', 'updatedAt'])
+    .enum([
+      'name',
+      'species',
+      'birthDate',
+      'createdAt',
+      'updatedAt',
+      'breed',
+      'sex',
+    ])
     .default('createdAt'),
   sortOrder: z.enum(['asc', 'desc']).default('desc'),
 })
