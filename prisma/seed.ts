@@ -202,12 +202,12 @@ async function main() {
   ]
 
   const cities = [
-    'Madrid',
-    'Barcelona',
-    'Valencia',
-    'Sevilla',
-    'Zaragoza',
-    'Málaga',
+    { name: 'Madrid', lat: 40.4168, lng: -3.7038 },
+    { name: 'Barcelona', lat: 41.3851, lng: 2.1734 },
+    { name: 'Valencia', lat: 39.4699, lng: -0.3763 },
+    { name: 'Sevilla', lat: 37.3891, lng: -5.9845 },
+    { name: 'Zaragoza', lat: 41.6488, lng: -0.8891 },
+    { name: 'Málaga', lat: 36.7213, lng: -4.4217 },
   ]
   const streets = [
     'Calle Mayor',
@@ -227,11 +227,18 @@ async function main() {
     const number = Math.floor(Math.random() * 200) + 1
     const phone = testPhones[Math.floor(Math.random() * testPhones.length)]
 
+    // Generar coordenadas aleatorias cerca de la ciudad seleccionada
+    // Variación de ±0.05 grados (aproximadamente ±5.5 km)
+    const latVariation = (Math.random() - 0.5) * 0.1 // -0.05 a +0.05
+    const lngVariation = (Math.random() - 0.5) * 0.1 // -0.05 a +0.05
+
     const client = await prisma.client.create({
       data: {
         name: `${firstName} ${lastName}`,
         phone,
-        address: `${street} ${number}, ${city}`,
+        address: `${street} ${number}, ${city.name}`,
+        latitude: city.lat + latVariation,
+        longitude: city.lng + lngVariation,
         notes: Math.random() > 0.5 ? 'Cliente regular' : null,
       },
     })

@@ -6,6 +6,8 @@ export const createClientSchema = z.object({
     message: 'Phone number must be exactly 10 characters long',
   }),
   address: z.string().nonempty(),
+  latitude: z.number().min(-90).max(90).optional(),
+  longitude: z.number().min(-180).max(180).optional(),
   notes: z.string().optional(),
 })
 

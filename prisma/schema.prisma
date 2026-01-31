@@ -71,12 +71,14 @@ model User {
 }
 
 model Client {
-  id       String  @id @default(uuid())
-  name     String
-  phone    String
-  address  String?
-  notes    String?
-  isActive Boolean @default(true)
+  id        String  @id @default(uuid())
+  name      String
+  phone     String
+  address   String?
+  latitude  Float?
+  longitude Float?
+  notes     String?
+  isActive  Boolean @default(true)
 
   user           User?           @relation
   medicalRecords MedicalRecord[]
