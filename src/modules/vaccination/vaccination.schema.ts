@@ -1,48 +1,27 @@
 import z from 'zod'
-import { VaccinationStatus } from '../../generated/prisma/enums'
 
-export const createVaccinationItemSchema = z
-  .object({
-    appliedAt: z.coerce.date().nullable(),
-    nextDueDate: z.coerce.date().nullable(),
-    status: z.enum(VaccinationStatus),
-    petId: z.string().nonempty(),
-    vaccineId: z.string().nonempty(),
-    veterinarianId: z.string().nonempty(),
-  })
-  .superRefine((data, ctx) => {
-    if (!data.appliedAt && !data.nextDueDate) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'At least one of appliedAt or nextDueDate must be provided',
-      })
-    }
-
-    if (
-      data.appliedAt &&
-      data.nextDueDate &&
-      data.nextDueDate <= data.appliedAt
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'nextDueDate must be after appliedAt',
-        path: ['nextDueDate'],
-      })
-    }
-  })
-
-export const updateVaccinationSchema = z.object({
-  appliedAt: z.coerce.date().nullable().optional(),
-  nextDueDate: z.coerce.date().nullable().optional(),
-  status: z.enum(VaccinationStatus).optional(),
+export const createVaccinationSchema = z.object({
+  appliedAt: z.coerce.date(),
+  nextDueDate: z.coerce.date().optional(),
+  medicationId: z.string(),
+  recordId: z.string(),
+  consultationId: z.string().optional(),
+  veterinarianId: z.string(),
 })
 
-export const petIdParamSchema = z.object({
-  petId: z.string().nonempty(),
+export const updateVaccinationSchema = z.object({
+  appliedAt: z.coerce.date().optional(),
+  nextDueDate: z.coerce.date().optional(),
+  medicationId: z.string().optional(),
+  consultationId: z.string().optional(),
+})
+
+export const recordIdParamSchema = z.object({
+  recordId: z.string(),
 })
 
 export const vaccinationIdParamSchema = z.object({
-  id: z.string().nonempty(),
+  id: z.string(),
 })
 
 export const dateRangeQuerySchema = z.object({
@@ -50,6 +29,17 @@ export const dateRangeQuerySchema = z.object({
   endDate: z.coerce.date(),
 })
 
-export type CreateVaccinationDto = z.infer<typeof createVaccinationItemSchema>
+export const vaccinationsQuerySchema = z.object({
+  recordId: z.string().optional(),
+  medicationId: z.string().optional(),
+  veterinarianId: z.string().optional(),
+  startDate: z.coerce.date().optional(),
+  endDate: z.coerce.date().optional(),
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(10),
+})
+
+export type CreateVaccinationDto = z.infer<typeof createVaccinationSchema>
 export type UpdateVaccinationDto = z.infer<typeof updateVaccinationSchema>
 export type DateRangeQueryDto = z.infer<typeof dateRangeQuerySchema>
+export type VaccinationsQueryDto = z.infer<typeof vaccinationsQuerySchema>

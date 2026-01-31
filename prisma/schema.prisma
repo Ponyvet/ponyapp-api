@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -27,112 +27,174 @@ enum Sex {
   FEMALE
 }
 
-enum VaccinationStatus {
-  APPLIED
-  PENDING
-  CANCELLED
-}
-
 enum UserRole {
   ADMIN
   VETERINARIAN
+  CLIENT
+}
+
+enum RecordType {
+  PET
+  GROUP
+}
+
+enum MedicationCategory {
+  VACCINE
+  ANTIBIOTIC
+  OTHER
+}
+
+enum InventoryCategory {
+  MEDICATION
+  MATERIAL
 }
 
 // =======================
 // MODELS
 // =======================
 
-model Client {
+model User {
   id        String   @id @default(uuid())
   name      String
-  phone     String
-  address   String
-  notes     String?
+  email     String   @unique
+  password  String
+  role      UserRole
+  clientId  String?  @unique
   isActive  Boolean  @default(true)
 
-  pets      Pet[]
+  client        Client?       @relation(fields: [clientId], references: [id])
+  consultations Consultation[]
+  vaccinations  Vaccination[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Client {
+  id       String  @id @default(uuid())
+  name     String
+  phone    String
+  address  String?
+  notes    String?
+  isActive Boolean @default(true)
+
+  user           User?           @relation
+  medicalRecords MedicalRecord[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MedicalRecord {
+  id       String     @id @default(uuid())
+  type     RecordType
+  name     String
+  notes    String?
+  isActive Boolean    @default(true)
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
+
+  pet           Pet?
+  animalGroup   AnimalGroup?
+  consultations Consultation[]
+  vaccinations  Vaccination[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Pet {
-  id         String   @id @default(uuid())
-  name       String
-  species    Species
-  breed      String?
-  sex        Sex
-  birthDate  DateTime?
+  id        String    @id @default(uuid())
+  species   Species
+  sex       Sex?
+  breed     String?
+  birthDate DateTime?
   color     String?
-  notes      String?
-  isActive   Boolean  @default(true)
+  notes     String?
 
-  clientId   String
-  client     Client   @relation(fields: [clientId], references: [id])
-
-  vaccinations Vaccination[]
+  recordId String        @unique
+  record   MedicalRecord @relation(fields: [recordId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Vaccine {
-  id           String   @id @default(uuid())
-  name         String
-  species      Species
-  type         String
-  intervalDays Int
-  isActive     Boolean  @default(true)
+model AnimalGroup {
+  id          String @id @default(uuid())
+  animalType  String
+  quantity    Int
+  notes       String?
+
+  recordId String        @unique
+  record   MedicalRecord @relation(fields: [recordId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Consultation {
+  id        String   @id @default(uuid())
+  date      DateTime
+  reason    String?
+  diagnosis String?
+  treatment String?
+  notes     String?
+
+  recordId        String
+  record          MedicalRecord @relation(fields: [recordId], references: [id])
+  veterinarianId  String
+  veterinarian    User          @relation(fields: [veterinarianId], references: [id])
 
   vaccinations Vaccination[]
+
+  createdAt DateTime @default(now())
+}
+
+model Medication {
+  id                   String            @id @default(uuid())
+  name                 String
+  category             MedicationCategory
+  species              Species?
+  defaultIntervalDays  Int?
+  notes                String?
+  isActive             Boolean           @default(true)
+
+  vaccinations    Vaccination[]
+  inventoryItems  InventoryItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Vaccination {
-  id              String   @id @default(uuid())
-  appliedAt       DateTime?
-  nextDueDate     DateTime?
-  status          VaccinationStatus
+  id           String    @id @default(uuid())
+  appliedAt    DateTime
+  nextDueDate  DateTime?
 
-  petId           String
-  pet             Pet      @relation(fields: [petId], references: [id])
-
-  vaccineId       String
-  vaccine         Vaccine  @relation(fields: [vaccineId], references: [id])
-
+  medicationId    String
+  medication      Medication    @relation(fields: [medicationId], references: [id])
+  recordId        String
+  record          MedicalRecord @relation(fields: [recordId], references: [id])
+  consultationId  String?
+  consultation    Consultation? @relation(fields: [consultationId], references: [id])
   veterinarianId  String
-  veterinarian    User     @relation(fields: [veterinarianId], references: [id])
-
-  reminder        Reminder?
-  isActive        Boolean  @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Reminder {
-  id             String   @id @default(uuid())
-  dueDate        DateTime
-  notified       Boolean  @default(false)
-  isActive       Boolean  @default(true)
-
-  vaccinationId  String   @unique
-  vaccination    Vaccination @relation(fields: [vaccinationId], references: [id])
+  veterinarian    User          @relation(fields: [veterinarianId], references: [id])
 
   createdAt DateTime @default(now())
 }
 
-model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  role      UserRole
-  password  String
-  isActive  Boolean  @default(true)
+model InventoryItem {
+  id             String            @id @default(uuid())
+  name           String
+  category       InventoryCategory
+  unit           String
+  quantity       Int
+  expirationDate DateTime?
+  medicationId   String?
+  isActive       Boolean           @default(true)
 
-  vaccinations Vaccination[]
+  medication Medication? @relation(fields: [medicationId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

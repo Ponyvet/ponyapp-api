@@ -9,5 +9,9 @@ export type LoginInput = z.infer<typeof loginSchema>
 
 export const sessionSchema = z.object({
   id: z.string(),
+  role: z.string(),
+  clientId: z.string().optional(),
   iat: z.number(),
 })
+
+export type SessionData = z.infer<typeof sessionSchema>

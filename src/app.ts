@@ -5,12 +5,16 @@ import cors from '@fastify/cors'
 
 import prismaPlugin from './plugins/prisma'
 import authPlugin from './plugins/auth'
+import authorizationPlugin from './plugins/authorization'
+
 import clientRoutes from './modules/clients/client.routes'
 import authRoutes from './modules/auth/auth.routes'
-import petsRoutes from './modules/pets/pets.routes'
-import vaccinesRoutes from './modules/vaccines/vaccines.routes'
-import vaccinationRoutes from './modules/vaccination/vaccination.routes'
 import usersRoutes from './modules/users/users.routes'
+import medicalRecordsRoutes from './modules/medical-records/medical-records.routes'
+import consultationsRoutes from './modules/consultations/consultations.routes'
+import medicationsRoutes from './modules/medications/medications.routes'
+import inventoryRoutes from './modules/inventory/inventory.routes'
+import vaccinationRoutes from './modules/vaccination/vaccination.routes'
 
 export const buildApp = () => {
   const app = Fastify({ logger: true })
@@ -20,8 +24,10 @@ export const buildApp = () => {
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   })
+
   app.register(prismaPlugin)
   app.register(authPlugin)
+  app.register(authorizationPlugin)
   app.register(cookie)
   app.register(jwt, {
     secret: process.env.JWT_SECRET!,
@@ -31,14 +37,14 @@ export const buildApp = () => {
     },
   })
 
-  app.register(clientRoutes, {
-    prefix: '/clients',
-  })
   app.register(authRoutes, { prefix: '/auth' })
-  app.register(petsRoutes, { prefix: '/pets' })
-  app.register(vaccinesRoutes, { prefix: '/vaccines' })
-  app.register(vaccinationRoutes, { prefix: '/vaccination' })
+  app.register(clientRoutes, { prefix: '/clients' })
   app.register(usersRoutes, { prefix: '/users' })
+  app.register(medicalRecordsRoutes, { prefix: '/medical-records' })
+  app.register(consultationsRoutes, { prefix: '/consultations' })
+  app.register(medicationsRoutes, { prefix: '/medications' })
+  app.register(inventoryRoutes, { prefix: '/inventory' })
+  app.register(vaccinationRoutes, { prefix: '/vaccinations' })
 
   return app
 }

@@ -1,22 +1,39 @@
 import type { FastifyInstance } from 'fastify'
 
 import type { CreatePetDto, UpdatePetDto, PetsQueryDto } from './pets.schema'
-import type { Prisma } from '../../generated/prisma/browser'
+import type { Prisma } from '../../generated/prisma'
 
-export const createPet = (
+export const createPet = async (
   prisma: FastifyInstance['prisma'],
   data: CreatePetDto,
 ) => {
+  // Crear el registro médico primero
+  const medicalRecord = await prisma.medicalRecord.create({
+    data: {
+      type: 'PET',
+      name: data.name,
+      notes: data.notes,
+      clientId: data.clientId,
+    },
+  })
+
+  // Luego crear la mascota
   return prisma.pet.create({
     data: {
-      name: data.name,
       species: data.species,
       breed: data.breed,
       sex: data.sex,
       birthDate: data.birthDate,
       color: data.color,
       notes: data.notes,
-      client: { connect: { id: data.clientId } },
+      recordId: medicalRecord.id,
+    },
+    include: {
+      record: {
+        include: {
+          client: true,
+        },
+      },
     },
   })
 }
@@ -27,8 +44,17 @@ export const getClientPets = (
 ) => {
   return prisma.pet.findMany({
     where: {
-      clientId,
-      isActive: true,
+      record: {
+        clientId,
+        isActive: true,
+      },
+    },
+    include: {
+      record: {
+        include: {
+          client: true,
+        },
+      },
     },
   })
 }
@@ -40,13 +66,16 @@ export const getAllPets = async (
   const { page, limit, sortBy, sortOrder, ...filters } = query
 
   const where: Prisma.PetWhereInput = {
-    isActive: true,
-    ...(filters.name && {
-      name: {
-        contains: filters.name,
-        mode: 'insensitive' as Prisma.QueryMode,
-      },
-    }),
+    record: {
+      isActive: true,
+      ...(filters.name && {
+        name: {
+          contains: filters.name,
+          mode: 'insensitive' as Prisma.QueryMode,
+        },
+      }),
+      ...(filters.clientId && { clientId: filters.clientId }),
+    },
     ...(filters.species && { species: filters.species }),
     ...(filters.sex && { sex: filters.sex }),
     ...(filters.breed && {
@@ -55,7 +84,6 @@ export const getAllPets = async (
         mode: 'insensitive' as Prisma.QueryMode,
       },
     }),
-    ...(filters.clientId && { clientId: filters.clientId }),
   }
 
   const skip = (page - 1) * limit
@@ -64,11 +92,15 @@ export const getAllPets = async (
     prisma.pet.findMany({
       where,
       include: {
-        client: {
-          select: {
-            id: true,
-            name: true,
-            phone: true,
+        record: {
+          include: {
+            client: {
+              select: {
+                id: true,
+                name: true,
+                phone: true,
+              },
+            },
           },
         },
       },
@@ -99,7 +131,16 @@ export const getSinglePet = (
   return prisma.pet.findFirst({
     where: {
       ...petId,
-      isActive: true,
+      record: {
+        isActive: true,
+      },
+    },
+    include: {
+      record: {
+        include: {
+          client: true,
+        },
+      },
     },
   })
 }
@@ -110,7 +151,12 @@ export const updatePet = async (
   data: UpdatePetDto,
 ) => {
   const existingPet = await prisma.pet.findFirst({
-    where: { id: petId, isActive: true },
+    where: {
+      id: petId,
+      record: {
+        isActive: true,
+      },
+    },
   })
 
   if (!existingPet) {
@@ -128,15 +174,21 @@ export const deletePet = async (
   petId: string,
 ) => {
   const existingPet = await prisma.pet.findFirst({
-    where: { id: petId, isActive: true },
+    where: {
+      id: petId,
+      record: {
+        isActive: true,
+      },
+    },
   })
 
   if (!existingPet) {
     return null
   }
 
-  return prisma.pet.update({
-    where: { id: petId },
+  // Marcar como inactivo el MedicalRecord, no el Pet directamente
+  return prisma.medicalRecord.update({
+    where: { id: existingPet.recordId },
     data: { isActive: false },
   })
 }

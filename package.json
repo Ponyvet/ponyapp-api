@@ -7,9 +7,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/server.ts",
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint .",
     "prepare": "husky",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "typecheck": "tsc --noEmit"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -24,6 +25,7 @@
     "@fastify/jwt": "^10.0.0",
     "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "^7.2.0",
+    "@prisma/client-runtime-utils": "^7.3.0",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.2.3",
     "fastify": "^5.6.2",
