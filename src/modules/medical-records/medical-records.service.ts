@@ -133,14 +133,20 @@ export const getSingleMedicalRecord = (
       animalGroup: true,
       consultations: {
         include: {
-          veterinarian: {
+          visit: {
             select: {
               id: true,
-              name: true,
+              date: true,
+              veterinarian: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
             },
           },
         },
-        orderBy: { date: 'desc' },
+        orderBy: { createdAt: 'desc' },
       },
       vaccinations: {
         include: {

@@ -3,7 +3,6 @@ import type {
   CreateConsultationDto,
   UpdateConsultationDto,
   ConsultationsQueryDto,
-  DateRangeQueryDto as _DateRangeQueryDto,
 } from './consultations.schema'
 
 export const createConsultation = (
@@ -11,11 +10,20 @@ export const createConsultation = (
   data: CreateConsultationDto,
 ) => {
   return prisma.consultation.create({
-    data: {
-      ...data,
-      date: data.date || new Date(),
-    },
+    data,
     include: {
+      visit: {
+        select: {
+          id: true,
+          date: true,
+          veterinarian: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
       record: {
         select: {
           id: true,
@@ -29,12 +37,6 @@ export const createConsultation = (
           },
         },
       },
-      veterinarian: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
     },
   })
 }
@@ -43,19 +45,12 @@ export const getConsultations = async (
   prisma: FastifyInstance['prisma'],
   query: ConsultationsQueryDto,
 ) => {
-  const { page, limit, recordId, veterinarianId, startDate, endDate } = query
+  const { page, limit, recordId, visitId } = query
   const skip = (page - 1) * limit
 
   const where = {
     ...(recordId && { recordId }),
-    ...(veterinarianId && { veterinarianId }),
-    ...(startDate &&
-      endDate && {
-        date: {
-          gte: new Date(startDate),
-          lte: new Date(endDate),
-        },
-      }),
+    ...(visitId && { visitId }),
   }
 
   const [consultations, total] = await Promise.all([
@@ -64,6 +59,24 @@ export const getConsultations = async (
       skip,
       take: limit,
       include: {
+        visit: {
+          select: {
+            id: true,
+            date: true,
+            veterinarian: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            client: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
         record: {
           select: {
             id: true,
@@ -77,14 +90,8 @@ export const getConsultations = async (
             },
           },
         },
-        veterinarian: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
       },
-      orderBy: { date: 'desc' },
+      orderBy: { createdAt: 'desc' },
     }),
     prisma.consultation.count({ where }),
   ])
@@ -109,10 +116,16 @@ export const getRecordConsultations = (
   return prisma.consultation.findMany({
     where: { recordId },
     include: {
-      veterinarian: {
+      visit: {
         select: {
           id: true,
-          name: true,
+          date: true,
+          veterinarian: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
       vaccinations: {
@@ -127,44 +140,7 @@ export const getRecordConsultations = (
         },
       },
     },
-    orderBy: { date: 'desc' },
-  })
-}
-
-export const getConsultationsByDateRange = (
-  prisma: FastifyInstance['prisma'],
-  startDate: Date,
-  endDate: Date,
-) => {
-  return prisma.consultation.findMany({
-    where: {
-      date: {
-        gte: startDate,
-        lte: endDate,
-      },
-    },
-    include: {
-      record: {
-        select: {
-          id: true,
-          name: true,
-          type: true,
-          client: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      },
-      veterinarian: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
-    orderBy: { date: 'desc' },
+    orderBy: { createdAt: 'desc' },
   })
 }
 
@@ -175,7 +151,7 @@ export const getSingleConsultation = (
   return prisma.consultation.findUnique({
     where: { id: consultationId },
     include: {
-      record: {
+      visit: {
         include: {
           client: {
             select: {
@@ -184,14 +160,18 @@ export const getSingleConsultation = (
               phone: true,
             },
           },
-          pet: true,
-          animalGroup: true,
+          veterinarian: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
-      veterinarian: {
-        select: {
-          id: true,
-          name: true,
+      record: {
+        include: {
+          pet: true,
+          animalGroup: true,
         },
       },
       vaccinations: {
@@ -218,11 +198,20 @@ export const updateConsultation = async (
 
   return prisma.consultation.update({
     where: { id: consultationId },
-    data: {
-      ...data,
-      ...(data.date && { date: data.date }),
-    },
+    data,
     include: {
+      visit: {
+        select: {
+          id: true,
+          date: true,
+          veterinarian: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
       record: {
         select: {
           id: true,
@@ -234,12 +223,6 @@ export const updateConsultation = async (
               name: true,
             },
           },
-        },
-      },
-      veterinarian: {
-        select: {
-          id: true,
-          name: true,
         },
       },
     },

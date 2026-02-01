@@ -40,8 +40,13 @@ export const createVaccination = (
       consultation: {
         select: {
           id: true,
-          date: true,
           reason: true,
+          visit: {
+            select: {
+              id: true,
+              date: true,
+            },
+          },
         },
       },
       veterinarian: {
@@ -111,8 +116,13 @@ export const getVaccinations = async (
         consultation: {
           select: {
             id: true,
-            date: true,
             reason: true,
+            visit: {
+              select: {
+                id: true,
+                date: true,
+              },
+            },
           },
         },
         veterinarian: {
@@ -171,8 +181,13 @@ export const getRecordVaccinations = (
       consultation: {
         select: {
           id: true,
-          date: true,
           reason: true,
+          visit: {
+            select: {
+              id: true,
+              date: true,
+            },
+          },
         },
       },
       veterinarian: {
@@ -300,10 +315,16 @@ export const getSingleVaccination = (
       },
       consultation: {
         include: {
-          veterinarian: {
+          visit: {
             select: {
               id: true,
-              name: true,
+              date: true,
+              veterinarian: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
             },
           },
         },

@@ -16,6 +16,7 @@ import medicationsRoutes from './modules/medications/medications.routes'
 import inventoryRoutes from './modules/inventory/inventory.routes'
 import vaccinationRoutes from './modules/vaccination/vaccination.routes'
 import petsRoutes from './modules/pets/pets.routes'
+import visitsRoutes from './modules/visits/visits.routes'
 
 export const buildApp = () => {
   const app = Fastify({ logger: true })
@@ -47,6 +48,7 @@ export const buildApp = () => {
   app.register(inventoryRoutes, { prefix: '/inventory' })
   app.register(vaccinationRoutes, { prefix: '/vaccinations' })
   app.register(petsRoutes, { prefix: '/pets' })
+  app.register(visitsRoutes, { prefix: '/visits' })
 
   return app
 }

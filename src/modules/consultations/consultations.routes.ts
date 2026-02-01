@@ -4,7 +4,6 @@ import {
   createConsultationController,
   getConsultationsController,
   getRecordConsultationsController,
-  getConsultationsByDateRangeController,
   getSingleConsultationController,
   updateConsultationController,
   deleteConsultationController,
@@ -15,7 +14,6 @@ export default function (app: FastifyInstance) {
 
   app.post('/', createConsultationController)
   app.get('/', getConsultationsController)
-  app.get('/date-range', getConsultationsByDateRangeController)
   app.get('/record/:recordId', getRecordConsultationsController)
   app.get('/:id', getSingleConsultationController)
   app.put('/:id', updateConsultationController)

@@ -1,19 +1,17 @@
 import { z } from 'zod'
 
-// Schema para crear consulta
+// Schema para crear consulta (dentro de una visita)
 export const createConsultationSchema = z.object({
+  visitId: z.string(),
   recordId: z.string(),
-  date: z.coerce.date().optional(),
   reason: z.string().optional(),
   diagnosis: z.string().optional(),
   treatment: z.string().optional(),
   notes: z.string().optional(),
-  veterinarianId: z.string(),
 })
 
 // Schema para actualizar consulta
 export const updateConsultationSchema = z.object({
-  date: z.coerce.date().optional(),
   reason: z.string().optional(),
   diagnosis: z.string().optional(),
   treatment: z.string().optional(),
@@ -32,18 +30,10 @@ export const recordIdParamSchema = z.object({
 
 // Schema para query de filtros
 export const consultationsQuerySchema = z.object({
+  visitId: z.string().optional(),
   recordId: z.string().optional(),
-  veterinarianId: z.string().optional(),
-  startDate: z.coerce.date().optional(),
-  endDate: z.coerce.date().optional(),
   page: z.coerce.number().min(1).default(1),
   limit: z.coerce.number().min(1).max(100).default(10),
-})
-
-// Schema para rango de fechas
-export const dateRangeQuerySchema = z.object({
-  startDate: z.coerce.date(),
-  endDate: z.coerce.date(),
 })
 
 // Tipos TypeScript exportados
@@ -52,4 +42,3 @@ export type UpdateConsultationDto = z.infer<typeof updateConsultationSchema>
 export type ConsultationIdParam = z.infer<typeof consultationIdParamSchema>
 export type RecordIdParam = z.infer<typeof recordIdParamSchema>
 export type ConsultationsQueryDto = z.infer<typeof consultationsQuerySchema>
-export type DateRangeQueryDto = z.infer<typeof dateRangeQuerySchema>

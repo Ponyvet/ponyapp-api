@@ -23,6 +23,7 @@ async function main() {
   await prisma.inventoryItem.deleteMany()
   await prisma.vaccination.deleteMany()
   await prisma.consultation.deleteMany()
+  await prisma.visit.deleteMany()
   await prisma.pet.deleteMany()
   await prisma.animalGroup.deleteMany()
   await prisma.medicalRecord.deleteMany()
@@ -362,21 +363,43 @@ async function main() {
 
   console.log('📘 Cartillas médicas y mascotas/grupos creados')
 
-  // Crear consultas
+  // Crear visitas y consultas
   const currentDate = new Date()
+  const visits = []
+
   for (let i = 0; i < 30; i++) {
     const record =
       medicalRecords[Math.floor(Math.random() * medicalRecords.length)]
     const veterinarian = Math.random() > 0.5 ? vet1 : vet2
 
+    // Obtener el cliente de la cartilla
+    const medicalRecord = await prisma.medicalRecord.findUnique({
+      where: { id: record.id },
+      select: { clientId: true },
+    })
+
+    if (!medicalRecord) continue
+
     // Fecha aleatoria en los últimos 60 días
-    const consultationDate = new Date(
+    const visitDate = new Date(
       currentDate.getTime() - Math.random() * 60 * 24 * 60 * 60 * 1000,
     )
 
+    // Crear visita
+    const visit = await prisma.visit.create({
+      data: {
+        date: visitDate,
+        generalNotes: Math.random() > 0.7 ? 'Visita de rutina' : null,
+        clientId: medicalRecord.clientId,
+        veterinarianId: veterinarian.id,
+      },
+    })
+
+    visits.push(visit)
+
+    // Crear consulta asociada a la visita
     await prisma.consultation.create({
       data: {
-        date: consultationDate,
         reason: 'Consulta de rutina',
         diagnosis:
           Math.random() > 0.5
@@ -384,12 +407,13 @@ async function main() {
             : 'Requiere seguimiento',
         treatment: Math.random() > 0.5 ? 'Tratamiento preventivo' : null,
         notes: Math.random() > 0.7 ? 'Mascota muy colaboradora' : null,
+        visitId: visit.id,
         recordId: record.id,
-        veterinarianId: veterinarian.id,
       },
     })
   }
 
+  console.log('📅 Visitas creadas')
   console.log('🩺 Consultas creadas')
 
   // Crear vacunaciones
@@ -433,6 +457,7 @@ async function main() {
     mascotas: await prisma.pet.count(),
     grupos: await prisma.animalGroup.count(),
     medicamentos: await prisma.medication.count(),
+    visitas: await prisma.visit.count(),
     consultas: await prisma.consultation.count(),
     vacunaciones: await prisma.vaccination.count(),
     inventario: await prisma.inventoryItem.count(),

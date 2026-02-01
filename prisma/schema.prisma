@@ -62,9 +62,9 @@ model User {
   clientId  String?  @unique
   isActive  Boolean  @default(true)
 
-  client        Client?       @relation(fields: [clientId], references: [id])
-  consultations Consultation[]
-  vaccinations  Vaccination[]
+  client       Client?       @relation(fields: [clientId], references: [id])
+  visits       Visit[]       @relation("VeterinarianVisits")
+  vaccinations Vaccination[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -82,6 +82,7 @@ model Client {
 
   user           User?           @relation
   medicalRecords MedicalRecord[]
+  visits         Visit[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -123,10 +124,10 @@ model Pet {
 }
 
 model AnimalGroup {
-  id          String @id @default(uuid())
-  animalType  String
-  quantity    Int
-  notes       String?
+  id         String  @id @default(uuid())
+  animalType String
+  quantity   Int
+  notes      String?
 
   recordId String        @unique
   record   MedicalRecord @relation(fields: [recordId], references: [id])
@@ -135,18 +136,32 @@ model AnimalGroup {
   updatedAt DateTime @updatedAt
 }
 
+model Visit {
+  id           String   @id @default(uuid())
+  date         DateTime
+  generalNotes String?
+
+  clientId       String
+  client         Client @relation(fields: [clientId], references: [id])
+  veterinarianId String
+  veterinarian   User   @relation("VeterinarianVisits", fields: [veterinarianId], references: [id])
+
+  consultations Consultation[]
+
+  createdAt DateTime @default(now())
+}
+
 model Consultation {
-  id        String   @id @default(uuid())
-  date      DateTime
+  id        String  @id @default(uuid())
   reason    String?
   diagnosis String?
   treatment String?
   notes     String?
 
-  recordId        String
-  record          MedicalRecord @relation(fields: [recordId], references: [id])
-  veterinarianId  String
-  veterinarian    User          @relation(fields: [veterinarianId], references: [id])
+  visitId  String
+  visit    Visit @relation(fields: [visitId], references: [id])
+  recordId String
+  record   MedicalRecord @relation(fields: [recordId], references: [id])
 
   vaccinations Vaccination[]
 

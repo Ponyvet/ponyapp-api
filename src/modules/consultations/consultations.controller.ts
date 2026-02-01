@@ -6,13 +6,11 @@ import {
   consultationIdParamSchema,
   recordIdParamSchema,
   consultationsQuerySchema,
-  dateRangeQuerySchema,
 } from './consultations.schema'
 import {
   createConsultation,
   getConsultations,
   getRecordConsultations,
-  getConsultationsByDateRange,
   getSingleConsultation,
   updateConsultation,
   deleteConsultation,
@@ -44,19 +42,6 @@ export const getRecordConsultationsController = async (
   const consultations = await getRecordConsultations(
     req.server.prisma,
     recordId,
-  )
-  reply.send(consultations)
-}
-
-export const getConsultationsByDateRangeController = async (
-  req: FastifyRequest,
-  reply: FastifyReply,
-) => {
-  const { startDate, endDate } = dateRangeQuerySchema.parse(req.query)
-  const consultations = await getConsultationsByDateRange(
-    req.server.prisma,
-    startDate,
-    endDate,
   )
   reply.send(consultations)
 }
