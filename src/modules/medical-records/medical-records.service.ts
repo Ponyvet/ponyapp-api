@@ -88,6 +88,13 @@ export const getClientMedicalRecords = (
       isActive: true,
     },
     include: {
+      client: {
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+        },
+      },
       pet: true,
       animalGroup: true,
       _count: {
