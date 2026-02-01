@@ -3,21 +3,10 @@ import type { FastifyInstance } from 'fastify'
 import type { CreatePetDto, UpdatePetDto, PetsQueryDto } from './pets.schema'
 import type { Prisma } from '../../generated/prisma'
 
-export const createPet = async (
+export const createPet = (
   prisma: FastifyInstance['prisma'],
   data: CreatePetDto,
 ) => {
-  // Crear el registro médico primero
-  const medicalRecord = await prisma.medicalRecord.create({
-    data: {
-      type: 'PET',
-      name: data.name,
-      notes: data.notes,
-      clientId: data.clientId,
-    },
-  })
-
-  // Luego crear la mascota
   return prisma.pet.create({
     data: {
       species: data.species,
@@ -26,7 +15,7 @@ export const createPet = async (
       birthDate: data.birthDate,
       color: data.color,
       notes: data.notes,
-      recordId: medicalRecord.id,
+      recordId: data.recordId,
     },
     include: {
       record: {
@@ -40,7 +29,7 @@ export const createPet = async (
 
 export const getClientPets = (
   prisma: FastifyInstance['prisma'],
-  clientId: CreatePetDto['clientId'],
+  clientId: CreatePetDto['recordId'],
 ) => {
   return prisma.pet.findMany({
     where: {

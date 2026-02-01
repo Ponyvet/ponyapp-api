@@ -12,6 +12,7 @@ export const createClient = (
 export const getClients = (prisma: FastifyInstance['prisma']) => {
   return prisma.client.findMany({
     where: { isActive: true },
+    orderBy: { updatedAt: 'desc' },
   })
 }
 

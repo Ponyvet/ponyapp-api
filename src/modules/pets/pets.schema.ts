@@ -7,7 +7,7 @@ export const createPetSchema = z.object({
   breed: z.string().optional(),
   sex: z.enum(Sex),
   birthDate: z.coerce.date().optional(),
-  clientId: z.string().nonempty(),
+  recordId: z.string().nonempty(),
   color: z.string().optional(),
   notes: z.string().optional(),
 })

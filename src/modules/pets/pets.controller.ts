@@ -8,7 +8,6 @@ import {
 } from './pets.schema'
 import {
   createPet,
-  getClientPets,
   getAllPets,
   getSinglePet,
   updatePet,
@@ -22,15 +21,6 @@ export const createPetController = async (
   const data = createPetSchema.parse(req.body)
   const pet = await createPet(req.server.prisma, data)
   reply.code(201).send(pet)
-}
-
-export const getClientPetsController = async (
-  req: FastifyRequest,
-  reply: FastifyReply,
-) => {
-  const clientId = req.params as { clientId: string }
-  const pets = await getClientPets(req.server.prisma, clientId.clientId)
-  reply.send(pets)
 }
 
 export const getAllPetsController = async (
