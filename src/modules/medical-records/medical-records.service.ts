@@ -49,6 +49,7 @@ export const getMedicalRecords = async (
             id: true,
             name: true,
             phone: true,
+            address: true,
           },
         },
         pet: true,
