@@ -22,6 +22,12 @@ export const createConsultation = (
               name: true,
             },
           },
+          client: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
       record: {

@@ -118,6 +118,12 @@ export const getClientVisits = (
           name: true,
         },
       },
+      client: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       consultations: {
         include: {
           record: {
