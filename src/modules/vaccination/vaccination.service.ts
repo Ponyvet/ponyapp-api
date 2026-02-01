@@ -155,6 +155,19 @@ export const getRecordVaccinations = (
           defaultIntervalDays: true,
         },
       },
+      record: {
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          client: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
       consultation: {
         select: {
           id: true,
