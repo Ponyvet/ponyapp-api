@@ -1,0 +1,79 @@
+name: CI / Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ─────────────────────────────────────────────
+  # CI: lint + typecheck + build
+  # ─────────────────────────────────────────────
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+  # ─────────────────────────────────────────────
+  # Deploy: solo en push a main, tras CI exitoso
+  # ─────────────────────────────────────────────
+  deploy:
+    name: Deploy to DigitalOcean
+    runs-on: ubuntu-latest
+    needs: ci
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+            cd ~/ponyapp-api
+
+            echo "→ Pulling latest changes..."
+            git pull origin main
+
+            echo "→ Installing dependencies..."
+            pnpm install --frozen-lockfile
+
+            echo "→ Building..."
+            pnpm build
+
+            echo "→ Running migrations..."
+            pnpm db:migrate
+
+            echo "→ Restarting server..."
+            pm2 restart ecosystem.config.cjs --env production
+
+            echo "✓ Deploy complete"
