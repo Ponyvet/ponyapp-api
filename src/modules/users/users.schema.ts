@@ -6,7 +6,7 @@ export const createUserSchema = z.object({
   email: z.email(),
   password: z.string().min(6),
   role: z.enum(UserRole),
-  clientId: z.string().optional(),
+  clientId: z.string().nullish(),
 })
 
 export const updateUserSchema = z.object({

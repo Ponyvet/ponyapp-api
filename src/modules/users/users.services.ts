@@ -114,6 +114,7 @@ export const createUser = async (
         },
       },
       createdAt: true,
+      isActive: true,
     },
   })
 }
