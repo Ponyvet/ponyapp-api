@@ -60,6 +60,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             set -e
+            source ~/.bashrc || source ~/.profile || true
             cd ~/ponyapp-api
 
             echo "→ Pulling latest changes..."
