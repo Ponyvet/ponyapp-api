@@ -13,7 +13,7 @@ export const updateUserSchema = z.object({
   name: z.string().nonempty().optional(),
   email: z.email().optional(),
   role: z.enum(UserRole).optional(),
-  clientId: z.string().optional(),
+  clientId: z.string().nullish(),
   isActive: z.boolean().optional(),
 })
 
