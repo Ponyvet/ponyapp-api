@@ -55,6 +55,25 @@ export const getMedicalRecords = async (
         },
         pet: true,
         animalGroup: true,
+        vaccinations: {
+          include: {
+            medication: {
+              select: {
+                id: true,
+                name: true,
+                category: true,
+              },
+            },
+            veterinarian: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+          orderBy: { appliedAt: 'desc' },
+          take: 1,
+        },
         _count: {
           select: {
             consultations: true,
@@ -67,8 +86,15 @@ export const getMedicalRecords = async (
     prisma.medicalRecord.count({ where }),
   ])
 
+  // Transform the data to include only the latest vaccination
+  const transformedRecords = medicalRecords.map((record) => ({
+    ...record,
+    latestVaccination: record.vaccinations[0] || null,
+    vaccinations: undefined, // Remove the array to clean up the response
+  }))
+
   return {
-    data: medicalRecords,
+    data: transformedRecords,
     pagination: {
       page,
       limit,
@@ -84,31 +110,58 @@ export const getClientMedicalRecords = (
   prisma: FastifyInstance['prisma'],
   clientId: string,
 ) => {
-  return prisma.medicalRecord.findMany({
-    where: {
-      clientId,
-      isActive: true,
-    },
-    include: {
-      client: {
-        select: {
-          id: true,
-          name: true,
-          phone: true,
-          address: true,
+  return prisma.medicalRecord
+    .findMany({
+      where: {
+        clientId,
+        isActive: true,
+      },
+      include: {
+        client: {
+          select: {
+            id: true,
+            name: true,
+            phone: true,
+            address: true,
+          },
+        },
+        pet: true,
+        animalGroup: true,
+        vaccinations: {
+          include: {
+            medication: {
+              select: {
+                id: true,
+                name: true,
+                category: true,
+              },
+            },
+            veterinarian: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+          orderBy: { appliedAt: 'desc' },
+          take: 1,
+        },
+        _count: {
+          select: {
+            consultations: true,
+            vaccinations: true,
+          },
         },
       },
-      pet: true,
-      animalGroup: true,
-      _count: {
-        select: {
-          consultations: true,
-          vaccinations: true,
-        },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+      orderBy: { createdAt: 'desc' },
+    })
+    .then((records) =>
+      records.map((record) => ({
+        ...record,
+        latestVaccination: record.vaccinations[0] || null,
+        vaccinations: undefined,
+      })),
+    )
 }
 
 export const getSingleMedicalRecord = (
