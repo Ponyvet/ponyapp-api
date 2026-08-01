@@ -238,6 +238,163 @@ Inventario físico (medicamentos y material).
 
 ## 4. Relaciones
 
+```mermaid
+erDiagram
+    USER {
+        string id PK
+        string name
+        string email UK
+        string password
+        UserRole role
+        string clientId FK
+        boolean isActive
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    CLIENT {
+        string id PK
+        string name
+        string phone
+        string address
+        float latitude
+        float longitude
+        string notes
+        boolean isActive
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    MEDICAL_RECORD {
+        string id PK
+        RecordType type
+        string name
+        string notes
+        boolean isActive
+        string clientId FK
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    PET {
+        string id PK
+        Species species
+        Sex sex
+        string breed
+        datetime birthDate
+        string color
+        string notes
+        string recordId FK
+    }
+
+    ANIMAL_GROUP {
+        string id PK
+        string animalType
+        int quantity
+        string notes
+        string recordId FK
+    }
+
+    VISIT {
+        string id PK
+        datetime date
+        string generalNotes
+        string clientId FK
+        string veterinarianId FK
+        datetime createdAt
+    }
+
+    CONSULTATION {
+        string id PK
+        string reason
+        string diagnosis
+        string treatment
+        string notes
+        string visitId FK
+        string recordId FK
+        datetime createdAt
+    }
+
+    MEDICATION {
+        string id PK
+        string name
+        MedicationCategory category
+        Species species
+        int defaultIntervalDays
+        string notes
+        boolean isActive
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    VACCINATION {
+        string id PK
+        datetime appliedAt
+        datetime nextDueDate
+        string medicationId FK
+        string recordId FK
+        string consultationId FK
+        string veterinarianId FK
+        datetime createdAt
+    }
+
+    INVENTORY_ITEM {
+        string id PK
+        string name
+        InventoryCategory category
+        string unit
+        int quantity
+        datetime expirationDate
+        string medicationId FK
+        boolean isActive
+        datetime createdAt
+    }
+
+    CLIENT ||--o| USER : "cuenta opcional"
+    CLIENT ||--o{ MEDICAL_RECORD : posee
+    CLIENT ||--o{ VISIT : "es atendido en"
+    MEDICAL_RECORD ||--o| PET : "es (si type=PET)"
+    MEDICAL_RECORD ||--o| ANIMAL_GROUP : "es (si type=GROUP)"
+    MEDICAL_RECORD ||--o{ CONSULTATION : tiene
+    MEDICAL_RECORD ||--o{ VACCINATION : tiene
+    VISIT ||--o{ CONSULTATION : agrupa
+    USER ||--o{ VISIT : "atiende como veterinario"
+    USER ||--o{ VACCINATION : aplica
+    CONSULTATION ||--o{ VACCINATION : "puede incluir"
+    MEDICATION ||--o{ VACCINATION : "se aplica como"
+    MEDICATION ||--o{ INVENTORY_ITEM : "se guarda como"
+```
+
+### Diagrama simplificado (solo entidades y relaciones)
+
+```mermaid
+erDiagram
+    USER
+    CLIENT
+    MEDICAL_RECORD
+    PET
+    ANIMAL_GROUP
+    VISIT
+    CONSULTATION
+    MEDICATION
+    VACCINATION
+    INVENTORY_ITEM
+
+    CLIENT ||--o| USER : "cuenta opcional"
+    CLIENT ||--o{ MEDICAL_RECORD : posee
+    CLIENT ||--o{ VISIT : "es atendido en"
+    MEDICAL_RECORD ||--o| PET : "es (si type=PET)"
+    MEDICAL_RECORD ||--o| ANIMAL_GROUP : "es (si type=GROUP)"
+    MEDICAL_RECORD ||--o{ CONSULTATION : tiene
+    MEDICAL_RECORD ||--o{ VACCINATION : tiene
+    VISIT ||--o{ CONSULTATION : agrupa
+    USER ||--o{ VISIT : "atiende como veterinario"
+    USER ||--o{ VACCINATION : aplica
+    CONSULTATION ||--o{ VACCINATION : "puede incluir"
+    MEDICATION ||--o{ VACCINATION : "se aplica como"
+    MEDICATION ||--o{ INVENTORY_ITEM : "se guarda como"
+```
+
 - Client → Visit (1 a muchos)
 - Client → MedicalRecord (1 a muchos)
 - Visit → Consultation (1 a muchos)
