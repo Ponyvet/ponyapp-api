@@ -6,3 +6,11 @@ meta {
 auth {
   mode: inherit
 }
+
+script:pre-request {
+  const hasSession = bru.cookies.jar().hasCookie(bru.getEnvVar("baseUrl"), "token")
+
+  if (!hasSession && !req.getUrl().endsWith("/auth/login")) {
+    await bru.runRequest("auth/Login")
+  }
+}

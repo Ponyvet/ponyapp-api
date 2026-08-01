@@ -11,27 +11,28 @@ There is no build, lint, or test command for this repo. "Testing" a request mean
 ## Environments
 
 Two environments live in `environments/`:
-- `local.bru` — `baseUrl: http://localhost:3000`, plus an empty `token` var populated after login.
+- `local.bru` — `baseUrl: http://127.0.0.1:3000`.
 - `local network.bru` — `baseUrl: http://192.168.1.110:3000` (LAN access, e.g. testing from a phone/device on the same network).
 
 The backend server itself is **not** part of this repo — it must be running separately (locally or on the LAN host above) for requests to succeed.
 
 ## Auth model
 
-- Login via `auth/Login.bru` (`POST /auth/login` with `email`/`password`) returns a token that must be copied into the environment's `token` variable — there is no pre-request script that does this automatically.
-- Folders that require authentication set `auth { mode: inherit }` in their `folder.bru` (e.g. `auth/`, `clients/`) and individual requests use `auth: bearer` with `auth:bearer { token: {{token}} }` referencing the environment var.
+- Auth is cookie-based, not bearer-token. `POST /auth/login` sets an httpOnly `token` cookie on the response; the backend's `@fastify/jwt` reads that cookie as a fallback whenever there's no `Authorization` header, so requests need no explicit auth header at all — every request's method block uses `auth: none` (or `auth: inherit`, which resolves to the same thing since no auth is set at the collection root).
+- Every `folder.bru` carries a `script:pre-request` block that auto-logs-in: it checks `bru.cookies.jar().hasCookie(baseUrl, "token")`, and if missing, runs `auth/Login` via `bru.runRequest("auth/Login")` before the actual request fires. The guard `!req.getUrl().endsWith("/auth/login")` prevents the Login request itself from re-triggering the script recursively. This requires Bruno's cookie jar to be enabled (Settings → General → Cookies — on by default) so the `Set-Cookie` from login persists and gets replayed automatically.
+- `Login.bru` uses the credentials hardcoded in its `body:json` (`vladimir@ponyvet.com` / `password123`) — update those if the seeded admin credentials change.
 - `auth/Logout.bru` and `auth/Profile data.bru` round out the auth folder.
+- There is no `token` environment variable anymore — don't reintroduce a bearer-token pattern when adding new requests; follow the cookie + auto-login pattern above instead.
 
 ## Collection conventions
 
 When adding or editing a request, follow the existing pattern exactly — every request in every folder conforms to this shape:
 
 1. **`meta` block**: `name`, `type: http`, and `seq` (sequence number controlling display order within the folder — increment from the last existing `seq` in that folder).
-2. **Method block** (`get`/`post`/`put`/`patch`/`delete`): `url: {{baseUrl}}/...`, `body: json|none`, `auth: bearer`.
-3. **`auth:bearer` block**: always `token: {{token}}`.
-4. **`body:json`** for write requests, with realistic example payloads (Spanish-language sample data is used throughout, e.g. `"Vacuna anual para felinos"`, `"Uso en consulta"` — keep new examples consistent with this).
-5. **`params:query`** block for requests taking query params (e.g. date-range endpoints use ISO 8601 `startDate`/`endDate`).
-6. **`tests` block**: every request includes exactly two Chai/Bruno assertions —
+2. **Method block** (`get`/`post`/`put`/`patch`/`delete`): `url: {{baseUrl}}/...`, `body: json|none`, `auth: none` (the folder's pre-request script handles login via cookie — see Auth model above).
+3. **`body:json`** for write requests, with realistic example payloads (Spanish-language sample data is used throughout, e.g. `"Vacuna anual para felinos"`, `"Uso en consulta"` — keep new examples consistent with this).
+4. **`params:query`** block for requests taking query params (e.g. date-range endpoints use ISO 8601 `startDate`/`endDate`).
+5. **`tests` block**: every request includes exactly two Chai/Bruno assertions —
    ```js
    test("Should return 401 without token", function() {
      expect(res.getStatus()).to.equal(401);

@@ -7,16 +7,12 @@ meta {
 get {
   url: {{baseUrl}}/medications
   body: none
-  auth: bearer
+  auth: none
 }
 
 params:query {
   page: 1
   limit: 10
-}
-
-auth:bearer {
-  token: {{token}}
 }
 
 tests {

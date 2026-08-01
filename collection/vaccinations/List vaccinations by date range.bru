@@ -7,16 +7,12 @@ meta {
 get {
   url: {{baseUrl}}/vaccinations/date-range
   body: none
-  auth: bearer
+  auth: none
 }
 
 params:query {
   startDate: 2026-01-01T00:00:00.000Z
   endDate: 2026-01-31T23:59:59.000Z
-}
-
-auth:bearer {
-  token: {{token}}
 }
 
 tests {
