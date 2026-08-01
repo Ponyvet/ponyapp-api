@@ -43,6 +43,8 @@ export const loginController = async (
     .setCookie('token', token, {
       httpOnly: true,
       path: '/',
+      sameSite: 'none',
+      secure: true,
     })
     .send({
       message: 'Inicio de sesión exitoso',
@@ -61,6 +63,8 @@ export const logoutController = (_req: FastifyRequest, reply: FastifyReply) => {
     .clearCookie('token', {
       httpOnly: true,
       path: '/',
+      sameSite: 'none',
+      secure: true,
     })
     .send({ message: 'Cierre de sesión exitoso' })
 }
