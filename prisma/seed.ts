@@ -20,7 +20,12 @@ async function main() {
     return
   }
 
-  const hashedPassword = await bcrypt.hash('Mvn32@E5Sxm9', 10)
+  const seedPassword = process.env.SEED_ADMIN_PASSWORD
+  if (!seedPassword) {
+    throw new Error('SEED_ADMIN_PASSWORD no está definida en las variables de entorno')
+  }
+
+  const hashedPassword = await bcrypt.hash(seedPassword, 10)
 
   await prisma.user.create({
     data: {
