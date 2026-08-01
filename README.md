@@ -34,10 +34,10 @@ DATABASE_URL="postgresql://ponyapp:change_me@localhost:5432/ponyapp"
 
 ```bash
 pnpm install
-cp .env.example .env   # fill in DATABASE_URL, JWT_SECRET, PORT
+cp .env.example .env   # fill in DATABASE_URL, JWT_SECRET, PORT, SEED_ADMIN_*
 pnpm db:generate
 pnpm db:migrate:dev
-pnpm db:seed            # creates the initial ADMIN user
+pnpm dev                # on first boot, creates the initial ADMIN user from SEED_ADMIN_* env vars
 ```
 
 ## Development

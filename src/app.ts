@@ -4,6 +4,7 @@ import jwt from '@fastify/jwt'
 import cors from '@fastify/cors'
 
 import prismaPlugin from './plugins/prisma'
+import bootstrapAdminPlugin from './plugins/bootstrap-admin'
 import authPlugin from './plugins/auth'
 import authorizationPlugin from './plugins/authorization'
 
@@ -28,6 +29,7 @@ export const buildApp = () => {
   })
 
   app.register(prismaPlugin)
+  app.register(bootstrapAdminPlugin)
   app.register(authPlugin)
   app.register(authorizationPlugin)
   app.register(cookie)

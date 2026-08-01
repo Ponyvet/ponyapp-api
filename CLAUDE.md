@@ -20,12 +20,13 @@ pnpm start            # node dist/server.js
 pnpm db:generate      # prisma generate  (required after any schema.prisma change)
 pnpm db:migrate:dev   # prisma migrate dev  (local: create + apply migration)
 pnpm db:migrate       # prisma migrate deploy  (production)
-pnpm db:seed          # creates the initial ADMIN user only
 ```
 
 There is no test suite (`pnpm test` is a stub). Verification = `pnpm typecheck && pnpm lint`, which is what CI runs. The husky pre-commit hook runs `pnpm lint`.
 
 Requires a `.env` with `DATABASE_URL`, `JWT_SECRET`, and optionally `PORT` (see `.env.example`).
+
+The initial ADMIN user is not seeded manually — `bootstrap-admin.ts` creates one automatically on app startup if no `ADMIN` user exists yet, reading `SEED_ADMIN_NAME`, `SEED_ADMIN_EMAIL`, and `SEED_ADMIN_PASSWORD` from the environment (creation is skipped with a warning if any of the three is missing).
 
 ## Architecture
 
@@ -36,6 +37,7 @@ Requires a `.env` with `DATABASE_URL`, `JWT_SECRET`, and optionally `PORT` (see 
 ### Plugins (`src/plugins/`, all wrapped in `fastify-plugin`)
 
 - `prisma.ts` — instantiates `PrismaClient` with the `@prisma/adapter-pg` driver adapter, decorates `app.prisma`, disconnects on close.
+- `bootstrap-admin.ts` — registered right after `prisma.ts` (registration order guarantees `app.prisma` exists first); creates the initial `ADMIN` user from `SEED_ADMIN_*` env vars if none exists yet. No decorators.
 - `auth.ts` — decorates `app.authenticate`: verifies the JWT (read from the `token` httpOnly cookie via `@fastify/cookie`) or replies 401.
 - `authorization.ts` — decorates `app.authorize(roles)` and `app.authorizeClient`. **Currently declared but not used by any route** — every module today applies only `app.authenticate`. Use these when adding role-gated endpoints rather than hand-rolling role checks.
 
