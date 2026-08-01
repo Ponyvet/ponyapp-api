@@ -1,0 +1,37 @@
+meta {
+  name: Update consultation
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/consultations/consultation-id-example
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "recordId": "record-id-example",
+    "date": "2026-01-31T10:00:00.000Z",
+    "reason": "Control rutinario - actualizado",
+    "diagnosis": "Animal saludable - confirmado",
+    "treatment": "Ninguno requerido",
+    "notes": "Control preventivo actualizado",
+    "veterinarianId": "vet-id-example"
+  }
+}
+
+tests {
+  test("Should return 401 without token", function() {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("Should return success with valid token", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+  });
+}

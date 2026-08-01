@@ -1,0 +1,36 @@
+meta {
+  name: Update inventory item
+  type: http
+  seq: 7
+}
+
+put {
+  url: {{baseUrl}}/inventory/inventory-id-example
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "name": "Jeringa 5ml - Actualizada",
+    "category": "MATERIAL",
+    "unit": "unidad",
+    "quantity": 150,
+    "expirationDate": "2026-12-31T23:59:59.000Z",
+    "medicationId": null
+  }
+}
+
+tests {
+  test("Should return 401 without token", function() {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("Should return success with valid token", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+  });
+}

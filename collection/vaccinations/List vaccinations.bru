@@ -1,0 +1,31 @@
+meta {
+  name: List vaccinations
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/vaccinations
+  body: none
+  auth: bearer
+}
+
+params:query {
+  page: 1
+  limit: 10
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("Should return 401 without token", function() {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("Should return paginated results", function() {
+    expect(res.getBody()).to.have.property('data');
+    expect(res.getBody()).to.have.property('pagination');
+  });
+}

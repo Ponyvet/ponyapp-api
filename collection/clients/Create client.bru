@@ -1,0 +1,25 @@
+meta {
+  name: Create client
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/clients
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Mario Lozano Hernandez",
+    "address": "El Tablon",
+    "phone": "7721432826",
+    "notes": "Le dicen el Gayonazo"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

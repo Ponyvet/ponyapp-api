@@ -1,0 +1,25 @@
+meta {
+  name: Update client
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{baseUrl}}/clients/18157e36-dc2f-4591-8b2a-6148268c7e07
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Mario Lozano Hernandez",
+    "address": "El Tablon",
+    "phone": "+5277223434390",
+    "notes": "Le dicen el Gayonazo de las lomas"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,16 @@
+meta {
+  name: Get single client
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/clients/18157e36-dc2f-4591-8b2a-6148268c7e07
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

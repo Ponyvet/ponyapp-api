@@ -1,0 +1,25 @@
+meta {
+  name: Get single user
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/users/user-id-example
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("Should return 401 without token", function() {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("Should return success with valid token", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+  });
+}
