@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}/auth/login
+  url: {{baseUrl}}/api/auth/sign-in/email
   body: json
   auth: inherit
 }
@@ -15,6 +15,12 @@ body:json {
     "email": "vladimir@ponyvet.com",
     "password": "password123"
   }
+}
+
+tests {
+  test("Should return success with valid credentials", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
 }
 
 settings {

@@ -18,10 +18,11 @@ The backend server itself is **not** part of this repo — it must be running se
 
 ## Auth model
 
-- Auth is cookie-based, not bearer-token. `POST /auth/login` sets an httpOnly `token` cookie on the response; the backend's `@fastify/jwt` reads that cookie as a fallback whenever there's no `Authorization` header, so requests need no explicit auth header at all — every request's method block uses `auth: none` (or `auth: inherit`, which resolves to the same thing since no auth is set at the collection root).
-- Every `folder.bru` carries a `script:pre-request` block that auto-logs-in: it checks `bru.cookies.jar().hasCookie(baseUrl, "token")`, and if missing, runs `auth/Login` via `bru.runRequest("auth/Login")` before the actual request fires. The guard `!req.getUrl().endsWith("/auth/login")` prevents the Login request itself from re-triggering the script recursively. This requires Bruno's cookie jar to be enabled (Settings → General → Cookies — on by default) so the `Set-Cookie` from login persists and gets replayed automatically.
-- `Login.bru` uses the credentials hardcoded in its `body:json` (`vladimir@ponyvet.com` / `password123`) — update those if the seeded admin credentials change.
-- `auth/Logout.bru` and `auth/Profile data.bru` round out the auth folder.
+- The backend uses [Better Auth](https://better-auth.com), mounted as a catch-all at `/api/auth/*`. There is no `/auth` module — auth is cookie-based, not bearer-token. `POST /api/auth/sign-in/email` sets an httpOnly `better-auth.session_token` cookie; every request's method block uses `auth: none` (or `auth: inherit`, which resolves to the same thing since no auth is set at the collection root).
+- Every `folder.bru` carries a `script:pre-request` block that auto-logs-in: it checks `bru.cookies.jar().hasCookie(baseUrl, "better-auth.session_token")`, and if missing, runs `auth/Login` via `bru.runRequest("auth/Login")` before the actual request fires. The guard `!req.getUrl().endsWith("/api/auth/sign-in/email")` prevents the Login request itself from re-triggering the script recursively. This requires Bruno's cookie jar to be enabled (Settings → General → Cookies — on by default) so the `Set-Cookie` from login persists and gets replayed automatically.
+- `Login.bru` (request name `Login`, hits `/api/auth/sign-in/email`) uses the credentials hardcoded in its `body:json` (`vladimir@ponyvet.com` / `password123`) — update those if the seeded admin credentials change. The request name stays `Login` even though the endpoint changed, since every `folder.bru` script references it by name via `bru.runRequest("auth/Login")`.
+- `auth/Logout.bru` hits `POST /api/auth/sign-out` and `auth/Get session.bru` hits `GET /api/auth/get-session` (replaces the old `POST /auth/profile`; the response shape is now `{ session, user }`, or `null` if there's no active session — `user` no longer includes the joined `client` relation, only `clientId`).
+- **Any cookie-authenticated request to `/api/auth/*` that isn't a plain `GET` requires an `Origin` header matching one of the backend's `trustedOrigins`** (`http://localhost:5173` in dev) — this is Better Auth's CSRF protection, and unlike a real browser, Bruno/curl won't add it automatically. `Logout.bru` sets this explicitly via a `headers` block; add the same header to any new state-changing request under `/api/auth/*` (endpoints outside `/api/auth/*`, like the rest of this collection, aren't affected — that check only applies to Better Auth's own routes).
 - There is no `token` environment variable anymore — don't reintroduce a bearer-token pattern when adding new requests; follow the cookie + auto-login pattern above instead.
 
 ## Collection conventions
@@ -49,7 +50,7 @@ Path-parameterized requests (get/update/delete single resource) use placeholder 
 
 Each top-level folder is one resource domain, generally offering list/get/create/update/delete plus a few domain-specific endpoints:
 
-- `auth/` — login, logout, profile.
+- `auth/` — login, logout, get session (Better Auth catch-all endpoints).
 - `clients/` — pet owner CRUD.
 - `medical-records/` — records CRUD, plus list-by-client.
 - `consultations/` — visit CRUD, plus list-by-medical-record and list-by-date-range.
