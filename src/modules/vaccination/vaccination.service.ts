@@ -4,7 +4,7 @@ import type {
   CreateVaccinationDto,
   UpdateVaccinationDto,
   VaccinationsQueryDto,
-} from './vaccination.schema'
+} from './vaccination.schema.js'
 
 export const createVaccination = (
   prisma: FastifyInstance['prisma'],

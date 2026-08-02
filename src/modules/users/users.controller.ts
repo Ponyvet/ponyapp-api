@@ -5,12 +5,12 @@ import {
   createUser,
   updateUser,
   deleteUser,
-} from './users.services'
+} from './users.services.js'
 import {
   createUserSchema,
   updateUserSchema,
   userIdParamSchema,
-} from './users.schema'
+} from './users.schema.js'
 
 export const getUserListController = async (
   req: FastifyRequest,
@@ -102,7 +102,7 @@ export const deleteUserController = async (
   reply: FastifyReply,
 ) => {
   const { id: userId } = userIdParamSchema.parse(req.params)
-  const user = await deleteUser(req.server.prisma, userId)
+  const user = await deleteUser(req.server.prisma, userId, req.headers)
 
   if (!user) {
     return reply.code(404).send({ message: 'User not found' })

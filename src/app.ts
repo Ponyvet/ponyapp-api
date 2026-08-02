@@ -1,23 +1,22 @@
 import Fastify from 'fastify'
-import cookie from '@fastify/cookie'
-import jwt from '@fastify/jwt'
 import cors from '@fastify/cors'
+import { fromNodeHeaders } from 'better-auth/node'
 
-import prismaPlugin from './plugins/prisma'
-import bootstrapAdminPlugin from './plugins/bootstrap-admin'
-import authPlugin from './plugins/auth'
-import authorizationPlugin from './plugins/authorization'
+import { auth } from './lib/auth.js'
+import prismaPlugin from './plugins/prisma.js'
+import bootstrapAdminPlugin from './plugins/bootstrap-admin.js'
+import authPlugin from './plugins/auth.js'
+import authorizationPlugin from './plugins/authorization.js'
 
-import clientRoutes from './modules/clients/client.routes'
-import authRoutes from './modules/auth/auth.routes'
-import usersRoutes from './modules/users/users.routes'
-import medicalRecordsRoutes from './modules/medical-records/medical-records.routes'
-import consultationsRoutes from './modules/consultations/consultations.routes'
-import medicationsRoutes from './modules/medications/medications.routes'
-import inventoryRoutes from './modules/inventory/inventory.routes'
-import vaccinationRoutes from './modules/vaccination/vaccination.routes'
-import petsRoutes from './modules/pets/pets.routes'
-import visitsRoutes from './modules/visits/visits.routes'
+import clientRoutes from './modules/clients/client.routes.js'
+import usersRoutes from './modules/users/users.routes.js'
+import medicalRecordsRoutes from './modules/medical-records/medical-records.routes.js'
+import consultationsRoutes from './modules/consultations/consultations.routes.js'
+import medicationsRoutes from './modules/medications/medications.routes.js'
+import inventoryRoutes from './modules/inventory/inventory.routes.js'
+import vaccinationRoutes from './modules/vaccination/vaccination.routes.js'
+import petsRoutes from './modules/pets/pets.routes.js'
+import visitsRoutes from './modules/visits/visits.routes.js'
 
 export const buildApp = () => {
   const app = Fastify({ logger: true })
@@ -32,16 +31,27 @@ export const buildApp = () => {
   app.register(bootstrapAdminPlugin)
   app.register(authPlugin)
   app.register(authorizationPlugin)
-  app.register(cookie)
-  app.register(jwt, {
-    secret: process.env.JWT_SECRET!,
-    cookie: {
-      cookieName: 'token',
-      signed: false,
+
+  app.route({
+    method: ['GET', 'POST'],
+    url: '/api/auth/*',
+    handler: async (request, reply) => {
+      const url = new URL(request.url, `http://${request.headers.host}`)
+
+      const req = new Request(url.toString(), {
+        method: request.method,
+        headers: fromNodeHeaders(request.headers),
+        ...(request.body ? { body: JSON.stringify(request.body) } : {}),
+      })
+
+      const response = await auth.handler(req)
+
+      reply.status(response.status)
+      response.headers.forEach((value, key) => reply.header(key, value))
+      return reply.send(response.body ? await response.text() : null)
     },
   })
 
-  app.register(authRoutes, { prefix: '/auth' })
   app.register(clientRoutes, { prefix: '/clients' })
   app.register(usersRoutes, { prefix: '/users' })
   app.register(medicalRecordsRoutes, { prefix: '/medical-records' })

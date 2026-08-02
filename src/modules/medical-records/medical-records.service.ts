@@ -3,7 +3,7 @@ import type {
   CreateMedicalRecordDto,
   UpdateMedicalRecordDto,
   MedicalRecordsQueryDto,
-} from './medical-records.schema'
+} from './medical-records.schema.js'
 
 export const createMedicalRecord = (
   prisma: FastifyInstance['prisma'],

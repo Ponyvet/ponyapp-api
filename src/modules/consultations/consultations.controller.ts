@@ -6,7 +6,7 @@ import {
   consultationIdParamSchema,
   recordIdParamSchema,
   consultationsQuerySchema,
-} from './consultations.schema'
+} from './consultations.schema.js'
 import {
   createConsultation,
   getConsultations,
@@ -14,7 +14,7 @@ import {
   getSingleConsultation,
   updateConsultation,
   deleteConsultation,
-} from './consultations.service'
+} from './consultations.service.js'
 
 export const createConsultationController = async (
   req: FastifyRequest,

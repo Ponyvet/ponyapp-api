@@ -3,7 +3,7 @@ import type {
   CreateMedicationDto,
   UpdateMedicationDto,
   MedicationsQueryDto,
-} from './medications.schema'
+} from './medications.schema.js'
 
 export const createMedication = (
   prisma: FastifyInstance['prisma'],

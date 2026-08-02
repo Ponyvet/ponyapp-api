@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { RecordType } from '../../generated/prisma/client'
+import { RecordType } from '../../generated/prisma/client.js'
 
 // Schema para crear cartilla médica
 export const createMedicalRecordSchema = z.object({

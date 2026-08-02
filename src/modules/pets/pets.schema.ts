@@ -1,5 +1,5 @@
 import z from 'zod'
-import { Sex, Species } from '../../generated/prisma/client'
+import { Sex, Species } from '../../generated/prisma/client.js'
 
 export const createPetSchema = z.object({
   species: z.enum(Species),

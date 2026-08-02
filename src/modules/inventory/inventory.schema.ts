@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { InventoryCategory } from '../../generated/prisma/client'
+import { InventoryCategory } from '../../generated/prisma/client.js'
 
 // Schema para crear artículo de inventario
 export const createInventoryItemSchema = z.object({

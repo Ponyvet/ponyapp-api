@@ -7,7 +7,7 @@ import {
   updateVaccinationSchema,
   vaccinationIdParamSchema,
   vaccinationsQuerySchema,
-} from './vaccination.schema'
+} from './vaccination.schema.js'
 import {
   createVaccination,
   getVaccinations,
@@ -17,7 +17,7 @@ import {
   getSingleVaccination,
   updateVaccination,
   deleteVaccination,
-} from './vaccination.service'
+} from './vaccination.service.js'
 
 export const createVaccinationController = async (
   req: FastifyRequest,

@@ -6,7 +6,7 @@ import {
   getSingleClientController,
   updateClientController,
   deleteClientController,
-} from './client.controller'
+} from './client.controller.js'
 
 export default function (app: FastifyInstance) {
   app.addHook('preHandler', app.authenticate)

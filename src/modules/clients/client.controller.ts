@@ -4,14 +4,14 @@ import {
   clientIdParamSchema,
   createClientSchema,
   updateClientSchema,
-} from './client.schema'
+} from './client.schema.js'
 import {
   createClient,
   getClients,
   getSingleClient,
   updateClient,
   deleteClient,
-} from './client.service'
+} from './client.service.js'
 
 export const createClientController = async (
   req: FastifyRequest,

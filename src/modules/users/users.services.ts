@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify'
-import bcrypt from 'bcrypt'
-import type { CreateUserDto, UpdateUserDto } from './users.schema'
+import { fromNodeHeaders } from 'better-auth/node'
+import type { CreateUserDto, UpdateUserDto } from './users.schema.js'
+import { auth } from '../../lib/auth.js'
 
 export const getUserList = (prisma: FastifyInstance['prisma']) => {
   return prisma.user.findMany({
@@ -91,16 +92,18 @@ export const createUser = async (
     }
   }
 
-  const hashedPassword = await bcrypt.hash(data.password, 10)
-
-  return prisma.user.create({
-    data: {
-      name: data.name,
+  const { user } = await auth.api.createUser({
+    body: {
       email: data.email,
-      password: hashedPassword,
+      password: data.password,
+      name: data.name,
       role: data.role,
-      clientId: data.clientId,
+      data: { clientId: data.clientId },
     },
+  })
+
+  return prisma.user.findUnique({
+    where: { id: user.id },
     select: {
       id: true,
       name: true,
@@ -190,6 +193,7 @@ export const updateUser = async (
 export const deleteUser = async (
   prisma: FastifyInstance['prisma'],
   userId: string,
+  requestHeaders: Record<string, string | string[] | undefined>,
 ) => {
   const existingUser = await prisma.user.findFirst({
     where: { id: userId, isActive: true },
@@ -199,8 +203,15 @@ export const deleteUser = async (
     return null
   }
 
-  return prisma.user.update({
+  const updatedUser = await prisma.user.update({
     where: { id: userId },
     data: { isActive: false },
   })
+
+  await auth.api.revokeUserSessions({
+    body: { userId },
+    headers: fromNodeHeaders(requestHeaders),
+  })
+
+  return updatedUser
 }

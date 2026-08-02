@@ -7,7 +7,7 @@ import {
   clientIdParamSchema,
   visitsQuerySchema,
   dateRangeQuerySchema,
-} from './visits.schema'
+} from './visits.schema.js'
 import {
   createVisit,
   getVisits,
@@ -16,7 +16,7 @@ import {
   getSingleVisit,
   updateVisit,
   deleteVisit,
-} from './visits.service'
+} from './visits.service.js'
 
 export const createVisitController = async (
   req: FastifyRequest,

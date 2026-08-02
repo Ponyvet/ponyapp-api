@@ -6,7 +6,7 @@ import {
   adjustInventorySchema,
   inventoryItemIdParamSchema,
   inventoryQuerySchema,
-} from './inventory.schema'
+} from './inventory.schema.js'
 import {
   createInventoryItem,
   getInventoryItems,
@@ -18,7 +18,7 @@ import {
   adjustInventoryQuantity,
   deleteInventoryItem,
   getInventoryStats,
-} from './inventory.service'
+} from './inventory.service.js'
 
 export const createInventoryItemController = async (
   req: FastifyRequest,

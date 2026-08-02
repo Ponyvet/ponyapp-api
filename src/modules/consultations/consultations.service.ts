@@ -3,7 +3,7 @@ import type {
   CreateConsultationDto,
   UpdateConsultationDto,
   ConsultationsQueryDto,
-} from './consultations.schema'
+} from './consultations.schema.js'
 
 export const createConsultation = (
   prisma: FastifyInstance['prisma'],

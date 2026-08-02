@@ -8,7 +8,7 @@ import {
   getSingleVisitController,
   updateVisitController,
   deleteVisitController,
-} from './visits.controller'
+} from './visits.controller.js'
 
 export default function (app: FastifyInstance) {
   app.addHook('preHandler', app.authenticate)

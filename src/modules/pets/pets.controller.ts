@@ -5,14 +5,14 @@ import {
   petIdParamSchema,
   updatePetSchema,
   petsQuerySchema,
-} from './pets.schema'
+} from './pets.schema.js'
 import {
   createPet,
   getAllPets,
   getSinglePet,
   updatePet,
   deletePet,
-} from './pets.service'
+} from './pets.service.js'
 
 export const createPetController = async (
   req: FastifyRequest,

@@ -1,6 +1,6 @@
 import type { FastifyInstance } from 'fastify'
 
-import type { Prisma } from '../../generated/prisma/client'
+import type { Prisma } from '../../generated/prisma/client.js'
 
 export const createClient = (
   prisma: FastifyInstance['prisma'],

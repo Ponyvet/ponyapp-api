@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { MedicationCategory, Species } from '../../generated/prisma/client'
+import { MedicationCategory, Species } from '../../generated/prisma/client.js'
 
 // Schema para crear medicamento
 export const createMedicationSchema = z.object({

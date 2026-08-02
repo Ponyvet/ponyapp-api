@@ -11,7 +11,7 @@ import {
   adjustInventoryQuantityController,
   deleteInventoryItemController,
   getInventoryStatsController,
-} from './inventory.controller'
+} from './inventory.controller.js'
 
 export default function (app: FastifyInstance) {
   app.addHook('preHandler', app.authenticate)

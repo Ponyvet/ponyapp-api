@@ -5,7 +5,7 @@ import {
   createUserController,
   updateUserController,
   deleteUserController,
-} from './users.controller'
+} from './users.controller.js'
 
 export default function (app: FastifyInstance) {
   app.addHook('preHandler', app.authenticate)

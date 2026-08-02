@@ -7,7 +7,7 @@ import {
   getSingleConsultationController,
   updateConsultationController,
   deleteConsultationController,
-} from './consultations.controller'
+} from './consultations.controller.js'
 
 export default function (app: FastifyInstance) {
   app.addHook('preHandler', app.authenticate)

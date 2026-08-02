@@ -6,7 +6,7 @@ import {
   getSinglePetController,
   updatePetController,
   deletePetController,
-} from './pets.controller'
+} from './pets.controller.js'
 
 export default function (app: FastifyInstance) {
   app.addHook('preHandler', app.authenticate)

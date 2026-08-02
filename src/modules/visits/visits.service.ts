@@ -3,7 +3,7 @@ import type {
   CreateVisitDto,
   UpdateVisitDto,
   VisitsQueryDto,
-} from './visits.schema'
+} from './visits.schema.js'
 
 export const createVisit = (
   prisma: FastifyInstance['prisma'],

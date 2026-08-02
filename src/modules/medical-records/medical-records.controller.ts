@@ -6,7 +6,7 @@ import {
   medicalRecordIdParamSchema,
   clientIdParamSchema,
   medicalRecordsQuerySchema,
-} from './medical-records.schema'
+} from './medical-records.schema.js'
 import {
   createMedicalRecord,
   getMedicalRecords,
@@ -14,7 +14,7 @@ import {
   getSingleMedicalRecord,
   updateMedicalRecord,
   deleteMedicalRecord,
-} from './medical-records.service'
+} from './medical-records.service.js'
 
 export const createMedicalRecordController = async (
   req: FastifyRequest,

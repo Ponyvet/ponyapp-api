@@ -33,24 +33,43 @@
 
 ## 👤 User
 
-Representa una cuenta de acceso al sistema.
+Representa una cuenta de acceso al sistema. La autenticación la maneja [Better Auth](https://better-auth.com); `role`, `clientId` e `isActive` son campos propios de Ponyvet extendidos sobre el modelo base de Better Auth.
 
 | Campo | Tipo | Obligatorio | Descripción |
 |---|---|---|---|
 | id | UUID | ✅ | Identificador único |
 | name | String | ✅ | Nombre del usuario |
 | email | String | ✅ | Correo (login) |
-| password | String | ✅ | Contraseña cifrada |
+| emailVerified | Boolean | ✅ | Verificación de correo (no se usa activamente hoy) |
+| image | String | ❌ | URL de avatar (no se usa hoy) |
 | role | Enum | ✅ | ADMIN / VETERINARIAN / CLIENT |
 | clientId | UUID | ❌ | Cliente asociado (solo rol CLIENT) |
 | isActive | Boolean | ✅ | Usuario activo |
+| banned | Boolean | ✅ | Suspendido por el plugin admin de Better Auth |
+| banReason | String | ❌ | Motivo de la suspensión |
+| banExpires | DateTime | ❌ | Expiración de la suspensión |
 | createdAt | DateTime | ✅ | Fecha de creación |
 | updatedAt | DateTime | ✅ | Última actualización |
+
+La contraseña **no** vive en `User`: cada credencial es una fila en `Account` (`providerId: "credential"`).
 
 ### Reglas
 - Usuarios ADMIN y VETERINARIAN **no tienen** `clientId`
 - Usuarios CLIENT **siempre** tienen `clientId`
 - Un usuario CLIENT solo puede ver información de su cliente
+- El registro público (`sign-up`) está deshabilitado; las cuentas solo se crean vía `POST /users/register` o el bootstrap del ADMIN inicial
+
+---
+
+## 🔐 Session, Account, Verification (Better Auth)
+
+Tablas propias de Better Auth, sin reglas de negocio de Ponyvet — se gestionan enteramente a través de su API (`/api/auth/*`).
+
+| Entidad | Propósito |
+|---|---|
+| Session | Sesión activa de un usuario (token, expiración, IP, user agent). Revocable vía `auth.api.revokeUserSessions`. |
+| Account | Credencial de acceso de un usuario (password para login por email, o tokens de un proveedor OAuth si se agrega en el futuro). |
+| Verification | Valores de verificación temporales (verificación de email, reseteo de contraseña, etc.). |
 
 ---
 
@@ -244,10 +263,36 @@ erDiagram
         string id PK
         string name
         string email UK
-        string password
+        boolean emailVerified
+        string image
         UserRole role
         string clientId FK
         boolean isActive
+        boolean banned
+        string banReason
+        datetime banExpires
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    SESSION {
+        string id PK
+        datetime expiresAt
+        string token UK
+        string ipAddress
+        string userAgent
+        string impersonatedBy
+        string userId FK
+        datetime createdAt
+        datetime updatedAt
+    }
+
+    ACCOUNT {
+        string id PK
+        string accountId
+        string providerId
+        string password
+        string userId FK
         datetime createdAt
         datetime updatedAt
     }
@@ -350,6 +395,8 @@ erDiagram
         datetime createdAt
     }
 
+    USER ||--o{ SESSION : "tiene"
+    USER ||--o{ ACCOUNT : "tiene"
     CLIENT ||--o| USER : "cuenta opcional"
     CLIENT ||--o{ MEDICAL_RECORD : posee
     CLIENT ||--o{ VISIT : "es atendido en"
@@ -370,6 +417,8 @@ erDiagram
 ```mermaid
 erDiagram
     USER
+    SESSION
+    ACCOUNT
     CLIENT
     MEDICAL_RECORD
     PET
@@ -380,6 +429,8 @@ erDiagram
     VACCINATION
     INVENTORY_ITEM
 
+    USER ||--o{ SESSION : "tiene"
+    USER ||--o{ ACCOUNT : "tiene"
     CLIENT ||--o| USER : "cuenta opcional"
     CLIENT ||--o{ MEDICAL_RECORD : posee
     CLIENT ||--o{ VISIT : "es atendido en"

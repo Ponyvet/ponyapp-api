@@ -5,7 +5,7 @@ import {
   updateMedicationSchema,
   medicationIdParamSchema,
   medicationsQuerySchema,
-} from './medications.schema'
+} from './medications.schema.js'
 import {
   createMedication,
   getMedications,
@@ -14,7 +14,7 @@ import {
   getSingleMedication,
   updateMedication,
   deleteMedication,
-} from './medications.service'
+} from './medications.service.js'
 
 export const createMedicationController = async (
   req: FastifyRequest,

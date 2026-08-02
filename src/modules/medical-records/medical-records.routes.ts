@@ -7,7 +7,7 @@ import {
   getSingleMedicalRecordController,
   updateMedicalRecordController,
   deleteMedicalRecordController,
-} from './medical-records.controller'
+} from './medical-records.controller.js'
 
 export default function (app: FastifyInstance) {
   app.addHook('preHandler', app.authenticate)

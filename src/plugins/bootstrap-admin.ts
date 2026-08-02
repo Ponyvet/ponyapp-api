@@ -1,8 +1,8 @@
 import fp from 'fastify-plugin'
 import type { FastifyPluginAsync } from 'fastify'
-import bcrypt from 'bcrypt'
 
-import { UserRole } from '../generated/prisma/client'
+import { UserRole } from '../generated/prisma/client.js'
+import { auth } from '../lib/auth.js'
 
 const bootstrapAdminPlugin: FastifyPluginAsync = fp(async (server) => {
   const existingAdmin = await server.prisma.user.findFirst({
@@ -24,14 +24,12 @@ const bootstrapAdminPlugin: FastifyPluginAsync = fp(async (server) => {
     return
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10)
-
-  await server.prisma.user.create({
-    data: {
-      name,
+  await auth.api.createUser({
+    body: {
       email,
+      password,
+      name,
       role: UserRole.ADMIN,
-      password: hashedPassword,
     },
   })
 

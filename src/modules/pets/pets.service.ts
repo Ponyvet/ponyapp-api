@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 
-import type { CreatePetDto, UpdatePetDto, PetsQueryDto } from './pets.schema'
-import type { Prisma } from '../../generated/prisma'
+import type { CreatePetDto, UpdatePetDto, PetsQueryDto } from './pets.schema.js'
+import type { Prisma } from '../../generated/prisma/client.js'
 
 export const createPet = (
   prisma: FastifyInstance['prisma'],

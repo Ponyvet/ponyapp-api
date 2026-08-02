@@ -9,7 +9,7 @@ import {
   getSingleVaccinationController,
   updateVaccinationController,
   deleteVaccinationController,
-} from './vaccination.controller'
+} from './vaccination.controller.js'
 
 export default function (app: FastifyInstance) {
   app.addHook('preHandler', app.authenticate)

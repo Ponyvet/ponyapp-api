@@ -8,7 +8,7 @@ import {
   getSingleMedicationController,
   updateMedicationController,
   deleteMedicationController,
-} from './medications.controller'
+} from './medications.controller.js'
 
 export default function (app: FastifyInstance) {
   app.addHook('preHandler', app.authenticate)

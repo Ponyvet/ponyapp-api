@@ -4,7 +4,7 @@ import type {
   UpdateInventoryItemDto,
   AdjustInventoryDto,
   InventoryQueryDto,
-} from './inventory.schema'
+} from './inventory.schema.js'
 
 export const createInventoryItem = (
   prisma: FastifyInstance['prisma'],
