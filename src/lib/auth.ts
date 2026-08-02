@@ -5,8 +5,6 @@ import { admin } from 'better-auth/plugins'
 import { prisma } from './prisma.js'
 import { ac, ADMIN, VETERINARIAN, CLIENT } from './permissions.js'
 
-const isProduction = process.env.NODE_ENV === 'production'
-
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: 'postgresql',
@@ -43,7 +41,7 @@ export const auth = betterAuth({
   advanced: {
     defaultCookieAttributes: {
       sameSite: 'none',
-      secure: isProduction,
+      secure: true,
     },
   },
 })
