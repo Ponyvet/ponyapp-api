@@ -22,7 +22,7 @@ export const buildApp = () => {
   const app = Fastify({ logger: true })
 
   app.register(cors, {
-    origin: ['http://localhost:5173', 'https://app.ponyvet.com'],
+    origin: ['http://localhost:5173', 'http://localhost:8081', 'https://app.ponyvet.com'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   })

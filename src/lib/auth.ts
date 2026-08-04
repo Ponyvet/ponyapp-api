@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth'
 import { prismaAdapter } from 'better-auth/adapters/prisma'
 import { admin } from 'better-auth/plugins'
+import { expo } from '@better-auth/expo'
 
 import { prisma } from './prisma.js'
 import { ac, ADMIN, VETERINARIAN, CLIENT } from './permissions.js'
@@ -11,7 +12,12 @@ export const auth = betterAuth({
   }),
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL,
-  trustedOrigins: ['http://localhost:5173', 'https://app.ponyvet.com'],
+  trustedOrigins: [
+    'http://localhost:5173',
+    'https://app.ponyvet.com',
+    'ponyappmobile://',
+    ...(process.env.NODE_ENV !== 'production' ? ['exp://', 'exp://**'] : []),
+  ],
   emailAndPassword: {
     enabled: true,
     disableSignUp: true,
@@ -37,6 +43,7 @@ export const auth = betterAuth({
       adminRoles: ['ADMIN'],
       defaultRole: 'CLIENT',
     }),
+    expo(),
   ],
   advanced: {
     defaultCookieAttributes: {
