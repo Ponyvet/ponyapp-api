@@ -1,0 +1,11 @@
+meta {
+  name: visits
+}
+
+script:pre-request {
+  const hasSession = bru.cookies.jar().hasCookie(bru.getEnvVar("baseUrl"), "better-auth.session_token")
+
+  if (!hasSession && !req.getUrl().endsWith("/api/auth/sign-in/email")) {
+    await bru.runRequest("auth/Login")
+  }
+}

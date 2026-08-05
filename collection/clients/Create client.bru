@@ -10,12 +10,42 @@ post {
   auth: inherit
 }
 
+script:pre-request {
+  // Bruno's npm module resolver doesn't honor faker's "require" export condition,
+  // so it loads the ESM build and crashes; requiring the .cjs file directly avoids that path.
+  const { fakerES_MX: faker } = require(`${bru.cwd()}/node_modules/@faker-js/faker/dist/index.cjs`)
+
+  const diasSemana = ["lunes", "martes", "miercoles", "jueves", "viernes", "sabado"]
+  const turnos = ["manana", "tarde"]
+  const especies = ["perros", "gatos"]
+
+  const noteGenerators = [
+    () => `Prefiere consultas los ${faker.helpers.arrayElement(diasSemana)} por la ${faker.helpers.arrayElement(turnos)}`,
+    () => "Cliente frecuente",
+    () => `Tiene ${faker.number.int({ min: 1, max: 4 })} ${faker.helpers.arrayElement(especies)}`,
+    () => "Tiene un perro y un gato",
+    () => `Recomendado por ${faker.person.firstName()}`,
+    () => `Cliente desde ${faker.date.past({ years: 5 }).getFullYear()}`,
+    () => ""
+  ]
+
+  bru.setVar("randomClientName", faker.person.fullName())
+  bru.setVar("randomClientAddress", faker.location.streetAddress())
+  bru.setVar("randomClientPhone", `77${faker.string.numeric(8)}`)
+  bru.setVar("randomClientNotes", faker.helpers.arrayElement(noteGenerators)())
+  // Bounding box around Tulancingo, Hidalgo, matching the 771 area code used above
+  bru.setVar("randomClientLatitude", faker.location.latitude({ min: 19.9, max: 20.2 }))
+  bru.setVar("randomClientLongitude", faker.location.longitude({ min: -98.5, max: -98.2 }))
+}
+
 body:json {
   {
-    "name": "Mario Lozano Hernandez",
-    "address": "El Tablon",
-    "phone": "7721432826",
-    "notes": "Le dicen el Gayonazo"
+    "name": "{{randomClientName}}",
+    "address": "{{randomClientAddress}}",
+    "phone": "{{randomClientPhone}}",
+    "notes": "{{randomClientNotes}}",
+    "latitude": {{randomClientLatitude}},
+    "longitude": {{randomClientLongitude}}
   }
 }
 

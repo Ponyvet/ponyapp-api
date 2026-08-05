@@ -10,12 +10,24 @@ put {
   auth: none
 }
 
+script:pre-request {
+  // Bruno's npm module resolver doesn't honor faker's "require" export condition,
+  // so it loads the ESM build and crashes; requiring the .cjs file directly avoids that path.
+  const { fakerES_MX: faker } = require(`${bru.cwd()}/node_modules/@faker-js/faker/dist/index.cjs`)
+
+  const firstName = faker.person.firstName()
+  const lastName = faker.person.lastName()
+
+  bru.setVar("randomUserName", `${firstName} ${lastName}`)
+  bru.setVar("randomUserEmail", faker.internet.email({ firstName, lastName }))
+  bru.setVar("randomUserRole", faker.helpers.arrayElement(["ADMIN", "VETERINARIAN"]))
+}
+
 body:json {
   {
-    "name": "Vladimir Azpeitia Updated",
-    "email": "vazpeitiah@gmail.com",
-    "password": "12345678",
-    "role": "VETERINARIAN",
+    "name": "{{randomUserName}}",
+    "email": "{{randomUserEmail}}",
+    "role": "{{randomUserRole}}",
     "clientId": null
   }
 }

@@ -1,0 +1,48 @@
+meta {
+  name: Update visit
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{baseUrl}}/visits/visit-id-example
+  body: json
+  auth: none
+}
+
+script:pre-request {
+  // Bruno's npm module resolver doesn't honor faker's "require" export condition,
+  // so it loads the ESM build and crashes; requiring the .cjs file directly avoids that path.
+  const { fakerES_MX: faker } = require(`${bru.cwd()}/node_modules/@faker-js/faker/dist/index.cjs`)
+
+  const especies = ["perros", "gatos"]
+
+  const noteGenerators = [
+    () => "Consulta de rutina - actualizado",
+    () => "Revision post-tratamiento - actualizado",
+    () => `Visita para vacunacion de ${faker.helpers.arrayElement(especies)} - actualizado`,
+    () => `Chequeo reprogramado por ${faker.person.firstName()}`,
+    () => "Emergencia resuelta",
+    () => ""
+  ]
+
+  bru.setVar("randomVisitDate", faker.date.recent({ days: 30 }).toISOString())
+  bru.setVar("randomVisitNotes", faker.helpers.arrayElement(noteGenerators)())
+}
+
+body:json {
+  {
+    "date": "{{randomVisitDate}}",
+    "generalNotes": "{{randomVisitNotes}}"
+  }
+}
+
+tests {
+  test("Should return 401 without token", function() {
+    expect(res.getStatus()).to.equal(401);
+  });
+
+  test("Should return success with valid token", function() {
+    expect(res.getStatus()).to.be.oneOf([200, 201]);
+  });
+}
